@@ -2,7 +2,6 @@ if SERVER then
 	AddCSLuaFile()
 	CreateConVar('sbox_maxtextscreens', "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 	CreateConVar('ss_call_to_home', "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
-	CreateConVar('ss_disable_ads', "0", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
 	function SSGetIP()
 		local hostip = GetConVarString("hostip")
@@ -152,17 +151,6 @@ if SERVER then
 	end)
 end
 
-hook.Add("Initialize", "NodeCraftServiceAdvert", function()
-	timer.Simple(15, function()
-		if GetConVarNumber('ss_disable_ads') == 1 then return end
-		if SERVER then
-			return print("\n\nLooking for a high performance Minecraft server host? Visit NodeCraft.com today!\nUse promotional code GMOD for 10% off!\n\n")
-		else
-			return MsgC(Color(30, 255, 255), "\n\nLooking for a high performance Minecraft server host?\nVisit ", Color(53, 208, 32), "N", Color(14, 167, 231), "o", Color(226, 40, 40), "d", Color(222, 215, 24), "e", Color(30, 255, 255), "Craft.com today!\nUse promotional code GMOD for 10% off!\n\n", "Type ", Color(222, 215, 24), "'nodecraft'", Color(30, 255, 255), " into your console for more info!\n\n")
-		end
-	end)
-end)
-
 if CLIENT then
 	properties.Add("addPermaScreen", {
 		MenuLabel = "Make perma textscreen",
@@ -197,7 +185,5 @@ if CLIENT then
 			return RunConsoleCommand("SS_TextScreen", "delete", ent:EntIndex())
 		end
 	})
-	concommand.Add("NodeCraft", function(ply, cmd, args)
-		return gui.OpenURL("http://nodecraft.com?ref=gmod")
-	end)
+
 end
