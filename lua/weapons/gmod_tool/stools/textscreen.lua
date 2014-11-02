@@ -1,4 +1,4 @@
-TOOL.Category		= "Construction - SS"
+TOOL.Category		= "Construction"
 TOOL.Name			= "#Textscreen"
 TOOL.Command		= nil
 TOOL.ConfigName		= ""
@@ -19,7 +19,7 @@ end
 cleanup.Register("textscreens")
 
 if (CLIENT) then
-	language.Add("Tool.textscreen.name", "SS Textscreen")
+	language.Add("Tool.textscreen.name", "3D2D Textscreen")
 	language.Add("Tool.textscreen.desc", "Create a textscreen with multiple lines, font colours and sizes.")
 
 	language.Add("Tool.textscreen.0", "Left Click: Spawn a textscreen Right Click: Update textscreen with settings")
@@ -96,7 +96,7 @@ end
 
 function TOOL.BuildCPanel(CPanel)
 	CPanel:AddControl("Header", {Text = "#Tool.textscreen.name", Description = "#Tool.textscreen.desc"})
-	CPanel:AddControl("Label", {Text = "From SammyServers.com\nVisit us online for some awesomely fun game servers!"})
+	CPanel:AddControl("Label", {Text = "By NodeCraft.com - affordable, high performance game servers!"})
 	resetall = vgui.Create("DButton", resetbuttons)
 	resetall:SetSize(100, 25)
 	resetall:SetText("Reset all")
