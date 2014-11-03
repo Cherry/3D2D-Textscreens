@@ -1,5 +1,5 @@
 TOOL.Category		= "Construction"
-TOOL.Name			= "#Textscreen"
+TOOL.Name			= "#Tool.textscreen.name"
 TOOL.Command		= nil
 TOOL.ConfigName		= ""
 
