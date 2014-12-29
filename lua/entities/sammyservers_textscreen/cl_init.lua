@@ -1,5 +1,7 @@
 include("shared.lua")
 
+ENT.RenderGroup = RENDERGROUP_BOTH
+
 for i=1, 100 do
 	surface.CreateFont("CV"..tostring(i), {
 		font ="coolvetica",
@@ -31,7 +33,7 @@ function ENT:Draw()
 		local totheight = 0
 		for k, v in pairs(lines) do
 			v.size = v.size > 100 and 100 or v.size
-			surface.SetFont("CV"..v.size)
+			surface.SetFont("CV"..math.Clamp(v.size, 1, 100))
 			TextWidth, TextHeight = surface.GetTextSize(v.text)
 			lines[k].twidth = TextWidth
 			lines[k].theight = TextHeight
@@ -42,7 +44,7 @@ function ENT:Draw()
 			local curheight = 0
 			for k, v in pairs(lines) do
 				local fontcolor = Color(v.r, v.g, v.b, v.a)
-				draw.DrawText(v.text, "CV"..v.size, 0, -(totheight/2)+curheight, fontcolor, TEXT_ALIGN_CENTER)
+				draw.DrawText(v.text, "CV"..math.Clamp(v.size, 1, 100), 0, -(totheight/2)+curheight, fontcolor, TEXT_ALIGN_CENTER)
 				curheight = curheight + v.theight
 			end
 			render.PopFilterMin()
@@ -53,7 +55,7 @@ function ENT:Draw()
 			local curheight = 0
 			for k, v in pairs(lines) do
 				local fontcolor = Color(v.r, v.g, v.b, v.a)
-				draw.DrawText(v.text, "CV"..v.size, 0, -(totheight/2)+curheight, fontcolor, TEXT_ALIGN_CENTER)
+				draw.DrawText(v.text, "CV"..math.Clamp(v.size, 1, 100), 0, -(totheight/2)+curheight, fontcolor, TEXT_ALIGN_CENTER)
 				curheight = curheight + v.theight
 			end
 			render.PopFilterMin()
