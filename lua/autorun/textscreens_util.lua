@@ -49,26 +49,27 @@ if SERVER then
 			textscreens = file.Read("sammyservers_textscreens.txt", "DATA")
 			if not textscreens then textscreens = {} return end
 			textscreens = util.JSONToTable(textscreens)
-			local i = 0
+			local count = 0
 			for k, v in pairs(textscreens) do
 				if v.MapName ~= game.GetMap() then continue end
-				local textscreen = ents.Create("sammyservers_textscreen")
-				textscreen:SetPos(Vector(v.posx, v.posy, v.posz))
-				textscreen:SetAngles(Angle(v.angp, v.angy, v.angr))
-				textscreen.uniqueName = v.uniqueName
-				textscreen:Spawn()
-				textscreen:Activate()
-				textscreen:SetMoveType(MOVETYPE_NONE)
-				textscreen:UpdateText(
-					{v.text1, v.text2, v.text3, v.text4, v.text5},
-					{Color(v.r1, v.g1, v.b1), Color(v.r2, v.g2, v.b2), Color(v.r3, v.g3, v.b3), Color(v.r4, v.g4, v.b4), Color(v.r5, v.g5, v.b5)},
-					{v.size1, v.size2, v.size3, v.size4, v.size5}
-				)
-				textscreen.isPermaTextScreen = true
-				textscreen:SetNWBool("isPermaTextScreen", true)
-				i = i + 1
+
+				local textScreen = ents.Create("sammyservers_textscreen")
+				textScreen:SetPos(Vector(v.posx, v.posy, v.posz))
+				textScreen:SetAngles(Angle(v.angp, v.angy, v.angr))
+				textScreen.uniqueName = v.uniqueName
+				textScreen:Spawn()
+				textScreen:Activate()
+				textScreen:SetMoveType(MOVETYPE_NONE)
+
+				for k, v in pairs(v.lines or {}) do
+					textScreen:SetLine(k, v.text, Color(v.color.r, v.color.g, v.color.b, v.color.a), v.size)
+				end
+
+				textScreen:SetIsPersisted(true)
+
+				count = count + 1
 			end
-			return print("Spawned "..i.." textscreens for map "..game.GetMap())
+			return print("Spawned ".. count .." textscreens for map " .. game.GetMap())
 		end)
 	end)
 
@@ -80,9 +81,9 @@ if SERVER then
 		local ent = Entity(args[2])
 		if not IsValid(ent) or ent:GetClass() ~= "sammyservers_textscreen" then return false end
 		if args[1] == "add" then
-			local toAdd = {}
 			local pos = ent:GetPos()
 			local ang = ent:GetAngles()
+			local toAdd = {}
 			toAdd.posx = pos.x
 			toAdd.posy = pos.y
 			toAdd.posz = pos.z
@@ -95,47 +96,11 @@ if SERVER then
 
 			toAdd.MapName = game.GetMap()
 
-			-- This should really use Data Tables nowadays...
-			toAdd.r1 = ent:GetNWInt("r1", 255)
-			toAdd.r2 = ent:GetNWInt("r2", 255)
-			toAdd.r3 = ent:GetNWInt("r3", 255)
-			toAdd.r4 = ent:GetNWInt("r4", 255)
-			toAdd.r5 = ent:GetNWInt("r5", 255)
-
-			toAdd.g1 = ent:GetNWInt("g1", 255)
-			toAdd.g2 = ent:GetNWInt("g2", 255)
-			toAdd.g3 = ent:GetNWInt("g3", 255)
-			toAdd.g4 = ent:GetNWInt("g4", 255)
-			toAdd.g5 = ent:GetNWInt("g5", 255)
-
-			toAdd.b1 = ent:GetNWInt("b1", 255)
-			toAdd.b2 = ent:GetNWInt("b2", 255)
-			toAdd.b3 = ent:GetNWInt("b3", 255)
-			toAdd.b4 = ent:GetNWInt("b4", 255)
-			toAdd.b5 = ent:GetNWInt("b5", 255)
-
-			toAdd.a1 = ent:GetNWInt("a1", 255)
-			toAdd.a2 = ent:GetNWInt("a2", 255)
-			toAdd.a3 = ent:GetNWInt("a3", 255)
-			toAdd.a4 = ent:GetNWInt("a4", 255)
-			toAdd.a5 = ent:GetNWInt("a5", 255)
-
-			toAdd.size1 = ent:GetNWInt("size1", 20)
-			toAdd.size2 = ent:GetNWInt("size2", 20)
-			toAdd.size3 = ent:GetNWInt("size3", 20)
-			toAdd.size4 = ent:GetNWInt("size4", 20)
-			toAdd.size5 = ent:GetNWInt("size5", 20)
-
-			toAdd.text1 = ent:GetNWString("text1", "")
-			toAdd.text2 = ent:GetNWString("text2", "")
-			toAdd.text3 = ent:GetNWString("text3", "")
-			toAdd.text4 = ent:GetNWString("text4", "")
-			toAdd.text5 = ent:GetNWString("text5", "")
+			toAdd.lines = ent.lines
 
 			table.insert(textscreens, toAdd)
 			file.Write("sammyservers_textscreens.txt", util.TableToJSON(textscreens))
-			ent.isPermaTextScreen = true
-			ent:SetNWBool("isPermaTextScreen", true)
+			ent:SetIsPersisted(true)
 
 			return ply:ChatPrint("Textscreen made permament and saved.")
 		else
@@ -159,7 +124,7 @@ if CLIENT then
 
 		Filter = function(self, ent, ply)
 			if not IsValid(ent) or ent:GetClass() ~= "sammyservers_textscreen" then return false end
-			if ent:GetNWBool("isPermaTextScreen") == true then return false end
+			if ent:GetIsPersisted() then return false end
 			return ply:IsAdmin()
 		end,
 
@@ -176,7 +141,7 @@ if CLIENT then
 
 		Filter = function(self, ent, ply)
 			if not IsValid(ent) or ent:GetClass() ~= "sammyservers_textscreen" then return false end
-			if ent:GetNWBool("isPermaTextScreen") ~= true then return false end
+			if not ent:GetIsPersisted() then return false end
 			return ply:IsAdmin()
 		end,
 

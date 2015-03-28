@@ -16,47 +16,48 @@ function ENT:Initialize()
 	self:SetMaterial("models/effects/vol_light001")
 	self:SetRenderMode(RENDERMODE_TRANSALPHA)
 	self:SetColor(255, 255, 255, 1)
+	self.lines = self.lines or {}
+	net.Start("textscreens_download")
+		net.WriteEntity(self)
+	net.SendToServer()
 end
 
 function ENT:Draw()	
 	if self:GetPos():Distance(LocalPlayer():GetPos()) < 1500 then
-		self:DrawModel()
 		local ang = self:GetAngles()
 		local pos = self:GetPos() + ang:Up()
 		local camangle = Angle(ang.p, ang.y, ang.r)
-		local lines = {}
-		for i = 1, 5 do
-			if self:GetNWString("Text"..i) ~= "" then
-				table.insert(lines, {text = self:GetNWString("Text"..i), r = self:GetNWInt("r"..i), g = self:GetNWInt("g"..i), b = self:GetNWInt("b"..i), a = self:GetNWInt("a"..i), size = self:GetNWInt("size"..i)})
-			end
-		end
+
+		self.lines = self.lines or {}
 		local totheight = 0
-		for k, v in pairs(lines) do
-			v.size = v.size > 100 and 100 or v.size
+
+		for k, v in pairs(self.lines) do
+			v.size = tonumber(v.size) > 100 and 100 or v.size
 			surface.SetFont("CV"..math.Clamp(v.size, 1, 100))
 			TextWidth, TextHeight = surface.GetTextSize(v.text)
-			lines[k].twidth = TextWidth
-			lines[k].theight = TextHeight
+			self.lines[k].width = TextWidth
+			self.lines[k].height = TextHeight
 			totheight = totheight + TextHeight
 		end
+
 		cam.Start3D2D(pos, camangle, .25)
 			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 			local curheight = 0
-			for k, v in pairs(lines) do
-				local fontcolor = Color(v.r, v.g, v.b, v.a)
-				draw.DrawText(v.text, "CV"..math.Clamp(v.size, 1, 100), 0, -(totheight/2)+curheight, fontcolor, TEXT_ALIGN_CENTER)
-				curheight = curheight + v.theight
+			for k, v in pairs(self.lines) do
+				draw.DrawText(v.text, "CV"..math.Clamp(v.size, 1, 100), 0, -(totheight/2)+curheight, v.color, TEXT_ALIGN_CENTER)
+				curheight = curheight + v.height
 			end
 			render.PopFilterMin()
 		cam.End3D2D()
+
 		camangle:RotateAroundAxis(camangle:Right(), 180)
+		
 		cam.Start3D2D(pos, camangle, .25)
 			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 			local curheight = 0
-			for k, v in pairs(lines) do
-				local fontcolor = Color(v.r, v.g, v.b, v.a)
-				draw.DrawText(v.text, "CV"..math.Clamp(v.size, 1, 100), 0, -(totheight/2)+curheight, fontcolor, TEXT_ALIGN_CENTER)
-				curheight = curheight + v.theight
+			for k, v in pairs(self.lines) do
+				draw.DrawText(v.text, "CV"..math.Clamp(v.size, 1, 100), 0, -(totheight/2)+curheight, v.color, TEXT_ALIGN_CENTER)
+				curheight = curheight + v.height
 			end
 			render.PopFilterMin()
 		cam.End3D2D()
@@ -69,3 +70,10 @@ end
 
 function ENT:Think()
 end
+
+net.Receive("textscreens_update", function( len )
+	local ent = net.ReadEntity()
+	if IsValid(ent) and ent:GetClass() == "sammyservers_textscreen" then
+		ent.lines = net.ReadTable()
+	end
+end)
