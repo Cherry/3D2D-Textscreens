@@ -41,26 +41,30 @@ function TOOL:LeftClick(tr)
 	if (CLIENT) then return true end
 
 	local ply = self:GetOwner()
-	local text = {}
-	local color = {}
-	local size = {}
-	for i = 1, 5 do
-		table.insert(text, i, self:GetClientInfo("text"..i))
-		table.insert(color, i, Color(tonumber(self:GetClientInfo("r"..i)), tonumber(self:GetClientInfo("g"..i)), tonumber(self:GetClientInfo("b"..i)), tonumber(self:GetClientInfo("a"..i))))
-		table.insert(size, i, tonumber(self:GetClientInfo("size"..i)))
-	end
 
 	if not (self:GetWeapon():CheckLimit("textscreens")) then return false end
 
 	local textScreen = ents.Create("sammyservers_textscreen")
 	textScreen:SetPos(tr.HitPos)
-	textScreen:Spawn()
-	textScreen:UpdateText(text, color, size)
 	local angle = tr.HitNormal:Angle()
 	angle:RotateAroundAxis(tr.HitNormal:Angle():Right(), -90)
 	angle:RotateAroundAxis(tr.HitNormal:Angle():Forward(), 90)
 	textScreen:SetAngles(angle)
+	textScreen:Spawn()
 	textScreen:Activate()
+	for i = 1, 5 do
+		textScreen:SetLine(
+			i, -- Line
+			self:GetClientInfo("text"..i), -- text
+			Color( -- Color
+				tonumber(self:GetClientInfo("r"..i)), 
+				tonumber(self:GetClientInfo("g"..i)), 
+				tonumber(self:GetClientInfo("b"..i)), 
+				tonumber(self:GetClientInfo("a"..i))
+			),
+			tonumber(self:GetClientInfo("size"..i))
+		)
+	end
 
 	undo.Create("textscreens")
 	undo.AddEntity(textScreen)
@@ -77,19 +81,23 @@ function TOOL:RightClick(tr)
 	if (tr.Entity:GetClass() == "player") then return false end
 	if (CLIENT) then return true end
 
-	local text = {}
-	local color = {}
-	local size = {}
-	for i = 1, 5 do
-		table.insert(text, i, self:GetClientInfo("text"..i))
-		table.insert(color, i, Color(tonumber(self:GetClientInfo("r"..i)), tonumber(self:GetClientInfo("g"..i)), tonumber(self:GetClientInfo("b"..i)), tonumber(self:GetClientInfo("a"..i))))
-		table.insert(size, i, tonumber(self:GetClientInfo("size"..i)))
-	end
-
 	local TraceEnt = tr.Entity
 
-	if (TraceEnt:IsValid() and TraceEnt:GetClass() == "sammyservers_textscreen") then
-		TraceEnt:UpdateText(text, color, size)
+	if (IsValid(TraceEnt) and TraceEnt:GetClass() == "sammyservers_textscreen") then
+		for i = 1, 5 do
+			TraceEnt:SetLine(
+				i, -- Line
+				tostring(self:GetClientInfo("text"..i)), -- text
+				Color( -- Color
+					tonumber(self:GetClientInfo("r"..i)), 
+					tonumber(self:GetClientInfo("g"..i)), 
+					tonumber(self:GetClientInfo("b"..i)), 
+					tonumber(self:GetClientInfo("a"..i))
+				),
+				tonumber(self:GetClientInfo("size"..i))
+			)
+		end
+		TraceEnt:Broadcast()
 		return true
 	end
 end

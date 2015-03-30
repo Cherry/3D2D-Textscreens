@@ -11,14 +11,6 @@ function ENT:Initialize()
 	self:SetMaterial("models/effects/vol_light001")
 	self:SetSolid(SOLID_VPHYSICS)
 	self:SetCollisionGroup(COLLISION_GROUP_WORLD)
-	for i = 1, 5 do
-		self:SetNWString("Text"..i, "")
-		self:SetNWInt("r"..i, 255)
-		self:SetNWInt("g"..i, 255)
-		self:SetNWInt("b"..i, 255)
-		self:SetNWInt("a"..i, 255)
-		self:SetNWInt("size"..i, 50)
-	end
 	self.heldby = 0
 	self:SetMoveType(MOVETYPE_NONE)
 end
@@ -43,24 +35,43 @@ local function textscreendrop(ply, ent)
 end
 hook.Add("PhysgunDrop", "textscreenpreventtraveldrop", textscreendrop)
 
-function ENT:UpdateText(NewText, NewColor, NewSize)
-	for i = 1, 5 do
-		if NewText[i] and NewColor[i] and NewSize[i] then
-			self:SetNWString("Text"..i, NewText[i])
-			self:SetNWInt("r"..i, NewColor[i].r)
-			self:SetNWInt("g"..i, NewColor[i].g)
-			self:SetNWInt("b"..i, NewColor[i].b)
-			self:SetNWInt("a"..i, NewColor[i].a)
-			self:SetNWInt("size"..i, NewSize[i])
-		end
-	end
-end
-
 local function textscreencantool(ply, trace, tool)
 	if IsValid(trace.Entity) and trace.Entity:GetClass() == "sammyservers_textscreen" then
-		if !(tool == "sammyservers_textscreen" or tool == "remover") then
+		if !(tool == "textscreen" or tool == "remover") then
 			return false
 		end
 	end
 end
 hook.Add("CanTool", "textscreenpreventtools", textscreencantool)
+
+util.AddNetworkString("textscreens_update")
+util.AddNetworkString("textscreens_download")
+
+function ENT:SetLine(line, text, color, size)
+	self.lines = self.lines or {}
+	self.lines[tonumber(line)] = {
+		["text"] = text,
+		["color"] = color,
+		["size"] = size
+	}
+end
+
+net.Receive("textscreens_download", function(len, ply)
+	if not IsValid(ply) then return end
+
+	local ent = net.ReadEntity()
+	if IsValid(ent) and ent:GetClass() == "sammyservers_textscreen" then
+		ent.lines = ent.lines or {}
+		net.Start("textscreens_update")
+			net.WriteEntity(ent)
+			net.WriteTable(ent.lines)
+		net.Send(ply)
+	end
+end)
+
+function ENT:Broadcast()
+	net.Start("textscreens_update")
+		net.WriteEntity(self)
+		net.WriteTable(self.lines)
+	net.Broadcast()
+end
