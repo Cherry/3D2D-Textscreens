@@ -15,7 +15,7 @@ end
 function ENT:Initialize()
 	self:SetMaterial("models/effects/vol_light001")
 	self:SetRenderMode(RENDERMODE_TRANSALPHA)
-	self:SetColor(255, 255, 255, 1)
+	self:SetColor( Color( 255, 255, 255, 1 ) )
 	self.lines = self.lines or {}
 	net.Start("textscreens_download")
 		net.WriteEntity(self)
