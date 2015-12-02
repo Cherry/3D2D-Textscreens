@@ -23,14 +23,14 @@ end
 
 local function textscreenpickup(ply, ent)
 	if IsValid(ent) and ent:GetClass() == "sammyservers_textscreen" then
-		ent.heldby = ent.heldby+1
+		ent.heldby = ent.heldby + 1
 	end
 end
 hook.Add("PhysgunPickup", "textscreenpreventtravelpickup", textscreenpickup)
 
 local function textscreendrop(ply, ent)
 	if IsValid(ent) and ent:GetClass() == "sammyservers_textscreen" then
-		ent.heldby = ent.heldby-1
+		ent.heldby = ent.heldby - 1
 	end
 end
 hook.Add("PhysgunDrop", "textscreenpreventtraveldrop", textscreendrop)
@@ -48,6 +48,9 @@ util.AddNetworkString("textscreens_update")
 util.AddNetworkString("textscreens_download")
 
 function ENT:SetLine(line, text, color, size)
+	if string.match(text, "#") then text = "Error. Illegal characters" end
+	if string.len(text) > 180 then text = "Error. Too long line" end
+
 	self.lines = self.lines or {}
 	self.lines[tonumber(line)] = {
 		["text"] = text,
@@ -57,7 +60,7 @@ function ENT:SetLine(line, text, color, size)
 end
 
 net.Receive("textscreens_download", function(len, ply)
-	if not IsValid(ply) then return end
+	if !IsValid(ply) then return end
 
 	local ent = net.ReadEntity()
 	if IsValid(ent) and ent:GetClass() == "sammyservers_textscreen" then
