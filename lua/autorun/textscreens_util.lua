@@ -1,6 +1,6 @@
 if SERVER then
 	AddCSLuaFile()
-	CreateConVar("sbox_maxtextscreens", "3", {FCVAR_NOTIFY, FCVAR_REPLICATED})
+	CreateConVar("sbox_maxtextscreens", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 	CreateConVar("ss_call_to_home", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
 	function SSGetIP()
@@ -50,11 +50,7 @@ if SERVER then
 			print("Spawning textscreens...")
 			textscreens = file.Read("sammyservers_textscreens.txt", "DATA")
 
-			if not textscreens then
-				textscreens = {}
-
-				return
-			end
+			if not textscreens then textscreens = {} return	end
 
 			textscreens = util.JSONToTable(textscreens)
 			local count = 0
@@ -84,7 +80,6 @@ if SERVER then
 	concommand.Add("SS_TextScreen", function(ply, cmd, args)
 		if not ply:IsSuperAdmin() or not args or not args[1] or not args[2] or not (args[1] == "delete" or args[1] == "add") then
 			ply:ChatPrint("not authorised, or bad arguments")
-
 			return
 		end
 

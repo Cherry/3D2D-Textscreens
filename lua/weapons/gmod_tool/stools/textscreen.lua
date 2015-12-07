@@ -48,7 +48,17 @@ function TOOL:LeftClick(tr)
 	textScreen:Activate()
 
 	for i = 1, 5 do
-		textScreen:SetLine(i, self:GetClientInfo("text" .. i), Color(tonumber(self:GetClientInfo("r" .. i)), tonumber(self:GetClientInfo("g" .. i)), tonumber(self:GetClientInfo("b" .. i)), tonumber(self:GetClientInfo("a" .. i))), tonumber(self:GetClientInfo("size" .. i)))
+		textScreen:SetLine(
+			i, -- Line
+			self:GetClientInfo("text"..i), -- text
+			Color( -- Color
+				tonumber(self:GetClientInfo("r"..i)),
+				tonumber(self:GetClientInfo("g"..i)),
+				tonumber(self:GetClientInfo("b"..i)),
+				tonumber(self:GetClientInfo("a"..i))
+			),
+			tonumber(self:GetClientInfo("size"..i))
+		)
 	end
 
 	-- Line
@@ -71,12 +81,19 @@ function TOOL:RightClick(tr)
 
 	if (IsValid(TraceEnt) and TraceEnt:GetClass() == "sammyservers_textscreen") then
 		for i = 1, 5 do
-			TraceEnt:SetLine(i, tostring(self:GetClientInfo("text" .. i)), Color(tonumber(self:GetClientInfo("r" .. i)), tonumber(self:GetClientInfo("g" .. i)), tonumber(self:GetClientInfo("b" .. i)), tonumber(self:GetClientInfo("a" .. i))), tonumber(self:GetClientInfo("size" .. i)))
+			TraceEnt:SetLine(
+				i, -- Line
+				tostring(self:GetClientInfo("text"..i)), -- text
+				Color( -- Color
+					tonumber(self:GetClientInfo("r"..i)), 
+					tonumber(self:GetClientInfo("g"..i)), 
+					tonumber(self:GetClientInfo("b"..i)), 
+					tonumber(self:GetClientInfo("a"..i))
+				),
+				tonumber(self:GetClientInfo("size"..i))
+			)
 		end
 
-		-- Line
-		-- text
-		-- Color
 		TraceEnt:Broadcast()
 
 		return true
