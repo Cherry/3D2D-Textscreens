@@ -100,6 +100,26 @@ function TOOL:RightClick(tr)
 	end
 end
 
+local function MakePresetControl(panel, mode, folder)
+	if not mode or not panel then return end
+	local TOOL = LocalPlayer():GetTool(mode)
+	if not TOOL then return end
+	local ctrl = vgui.Create( "ControlPresets", panel )
+	ctrl:SetPreset(folder or mode)
+	if TOOL.ClientConVar then
+		local options = {}
+		for k, v in pairs(TOOL.ClientConVar) do
+			if k ~= "id" then
+				k = mode.."_"..k
+				options[k] = v
+				ctrl:AddConVar(k)
+			end
+		end
+		ctrl:AddOption("#Default", options)
+	end
+	panel:AddPanel( ctrl )
+end
+
 function TOOL.BuildCPanel(CPanel)
 	CPanel:AddControl("Header", {
 		Text = "#Tool.textscreen.name",
@@ -194,6 +214,8 @@ function TOOL.BuildCPanel(CPanel)
 	end
 
 	CPanel:AddItem(resetline)
+
+	MakePresetControl(CPanel, "textscreen")
 
 	for i = 1, 5 do
 		lineLabels[i] = CPanel:AddControl("Label", {
