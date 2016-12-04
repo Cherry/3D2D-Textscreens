@@ -245,6 +245,7 @@ function TOOL.BuildCPanel(CPanel)
 
 		sliders[i].OnValueChanged = function(panel, value)
 			labels[i]:SetFont("CV" .. math.Round(value))
+			labels[i]:SetHeight(tonumber(value))
 		end
 
 		CPanel:AddItem(sliders[i])
@@ -266,6 +267,8 @@ function TOOL.BuildCPanel(CPanel)
 		})
 
 		labels[i]:SetFont("Default")
+		labels[i]:SetAutoStretchVertical(true)
+		labels[i]:SetDisabled(true)
 
 		labels[i].Think = function()
 			labels[i]:SetColor(
