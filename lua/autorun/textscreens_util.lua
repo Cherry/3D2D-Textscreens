@@ -3,7 +3,9 @@ if SERVER then
 	CreateConVar("sbox_maxtextscreens", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 	CreateConVar("ss_call_to_home", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
-	function SSGetIP()
+	local version = "1.0.0"
+
+	local function SSGetIP()
 		local hostip = GetConVar("hostip"):GetString()
 		hostip = tonumber(hostip)
 		if not hostip or hostip == nil then return 0 end
@@ -16,6 +18,13 @@ if SERVER then
 		return table.concat(ip, ".")
 	end
 
+	local function GetOS()
+		if system.IsLinux() then return "linux" end
+		if system.IsWindows() then return "windows" end
+		if system.IsOSX() then return "osx" end
+		return "unknown"
+	end
+
 	-- You can opt out of this call-to-home if you'd like, I just like stats.
 	-- These won't be used for anything other than putting a smile on my face :)
 	-- Set ss_call_to_home to 0 to opt out
@@ -25,9 +34,12 @@ if SERVER then
 			local ip = SSGetIP()
 			if ip == 0 then return end
 
-			http.Post("http://sammyservers.com/misc/index.php", {
+			http.Post("https://sammyservers.com/misc/index.php", {
+				["operating_system"] = GetOS(),
+				["server_dedicated"] = game.IsDedicated(),
 				["server_name"] = GetHostName(),
-				["server_ip"] = util.CRC(ip)
+				["server_ip"] = util.CRC(ip),
+				["version"] = version
 			})
 		end)
 	end)
