@@ -3,7 +3,7 @@ if SERVER then
 	CreateConVar("sbox_maxtextscreens", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 	CreateConVar("ss_call_to_home", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
-	local version = "1.0.0"
+	local version = "1.0.1"
 
 	local function SSGetIP()
 		local hostip = GetConVar("hostip"):GetString()

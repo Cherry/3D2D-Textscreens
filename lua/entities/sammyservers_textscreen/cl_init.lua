@@ -1,6 +1,8 @@
 include("shared.lua")
 ENT.RenderGroup = RENDERGROUP_BOTH
 
+local render_range = CreateClientConVar("ss_render_range", 1500, true, false, "Determines the render range for Textscreens. Default 1500")
+
 for i = 1, 100 do
 	surface.CreateFont("CV" .. tostring(i), {
 		font = "coolvetica",
@@ -22,7 +24,7 @@ function ENT:Initialize()
 end
 
 function ENT:Draw()
-	if self:GetPos():Distance(LocalPlayer():GetPos()) < 1500 then
+	if self:GetPos():Distance(LocalPlayer():GetPos()) < render_range:GetInt() then
 		local ang = self:GetAngles()
 		local pos = self:GetPos() + ang:Up()
 		local camangle = Angle(ang.p, ang.y, ang.r)
