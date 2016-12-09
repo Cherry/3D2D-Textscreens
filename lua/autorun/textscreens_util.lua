@@ -3,20 +3,7 @@ if SERVER then
 	CreateConVar("sbox_maxtextscreens", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 	CreateConVar("ss_call_to_home", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
-	local version = "1.0.1"
-
-	local function SSGetIP()
-		local hostip = GetConVar("hostip"):GetString()
-		hostip = tonumber(hostip)
-		if not hostip or hostip == nil then return 0 end
-		local ip = {}
-		ip[1] = bit.rshift(bit.band(hostip, 0xFF000000), 24)
-		ip[2] = bit.rshift(bit.band(hostip, 0x00FF0000), 16)
-		ip[3] = bit.rshift(bit.band(hostip, 0x0000FF00), 8)
-		ip[4] = bit.band(hostip, 0x000000FF)
-
-		return table.concat(ip, ".")
-	end
+	local version = "1.0.2"
 
 	local function GetOS()
 		if system.IsLinux() then return "linux" end
@@ -31,14 +18,12 @@ if SERVER then
 	hook.Add("Initialize", "CallToHomeSS", function()
 		timer.Simple(15, function()
 			if GetConVar("ss_call_to_home"):GetInt() == 0 then return end
-			local ip = SSGetIP()
-			if ip == 0 then return end
 
 			http.Post("https://sammyservers.com/misc/index.php", {
 				["operating_system"] = GetOS(),
-				["server_dedicated"] = game.IsDedicated(),
+				["server_dedicated"] = game.IsDedicated() and "true" or "false",
 				["server_name"] = GetHostName(),
-				["server_ip"] = util.CRC(ip),
+				["server_ip"] = util.CRC(game.GetIPAddress()),
 				["version"] = version
 			})
 		end)
@@ -85,7 +70,7 @@ if SERVER then
 				count = count + 1
 			end
 
-			return print("Spawned " .. count .. " textscreens for map " .. game.GetMap())
+			print("Spawned " .. count .. " textscreens for map " .. game.GetMap())
 		end)
 	end)
 
