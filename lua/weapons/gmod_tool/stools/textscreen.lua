@@ -1,5 +1,5 @@
 TOOL.Category = "Construction"
-TOOL.Name = "#Tool.textscreen.name"
+TOOL.Name = "#tool.textscreen.name"
 TOOL.Command = nil
 TOOL.ConfigName = ""
 local textBox = {}
@@ -19,10 +19,17 @@ end
 cleanup.Register("textscreens")
 
 if (CLIENT) then
-	language.Add("Tool.textscreen.name", "3D2D Textscreen")
-	language.Add("Tool.textscreen.desc", "Create a textscreen with multiple lines, font colours and sizes.")
-	language.Add("Tool.textscreen.0", "Left Click: Spawn a textscreen Right Click: Update textscreen with settings")
-	language.Add("Tool_textscreen_0", "Left Click: Spawn a textscreen Right Click: Update textscreen with settings")
+	TOOL.Information = {
+		{ name = "left" },
+		{ name = "right" },
+		{ name = "reload" },
+	}
+
+	language.Add("tool.textscreen.name", "3D2D Textscreen")
+	language.Add("tool.textscreen.desc", "Create a textscreen with multiple lines, font colours and sizes.")
+	language.Add("tool.textscreen.left", "Spawn a textscreen.") -- Does not work with capital T in tool. Same with right and reload.
+	language.Add("tool.textscreen.right", "Update textscreen with settings.")
+	language.Add("tool.textscreen.reload", "Copy textscreen.")
 	language.Add("Undone.textscreens", "Undone textscreen")
 	language.Add("Undone_textscreens", "Undone textscreen")
 	language.Add("Cleanup.textscreens", "Textscreens")
@@ -100,6 +107,23 @@ function TOOL:RightClick(tr)
 	end
 end
 
+function TOOL:Reload(tr)
+	local TraceEnt = tr.Entity
+	if (not isentity(TraceEnt) or TraceEnt:GetClass() ~= "sammyservers_textscreen") then return false end
+
+	for i = 1, 5 do
+		local linedata = TraceEnt.lines[i]
+		RunConsoleCommand("textscreen_r" .. i, linedata.color.r)
+		RunConsoleCommand("textscreen_g" .. i, linedata.color.g)
+		RunConsoleCommand("textscreen_b" .. i, linedata.color.b)
+		RunConsoleCommand("textscreen_a" .. i, linedata.color.a)
+		RunConsoleCommand("textscreen_size" .. i, linedata.size)
+		RunConsoleCommand("textscreen_text" .. i, linedata.text)
+	end
+
+	return true
+end
+
 local function MakePresetControl(panel, mode, folder)
 	if not mode or not panel then return end
 	local TOOL = LocalPlayer():GetTool(mode)
@@ -122,8 +146,8 @@ end
 
 function TOOL.BuildCPanel(CPanel)
 	CPanel:AddControl("Header", {
-		Text = "#Tool.textscreen.name",
-		Description = "#Tool.textscreen.desc"
+		Text = "#tool.textscreen.name",
+		Description = "#tool.textscreen.desc"
 	})
 
 	CPanel:AddControl("Label", {
