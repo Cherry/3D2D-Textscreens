@@ -9,10 +9,11 @@ function ENT:Initialize()
 	self:DrawShadow(false)
 	self:SetModel("models/hunter/plates/plate1x1.mdl")
 	self:SetMaterial("models/effects/vol_light001")
-	self:SetSolid(SOLID_VPHYSICS)
+	self:SetSolid(SOLID_BBOX)
 	self:SetCollisionGroup(COLLISION_GROUP_WORLD)
 	self.heldby = 0
 	self:SetMoveType(MOVETYPE_NONE)
+	self:SetCollisionBounds(Vector(0, -20, -10),Vector(1, 20, 10))
 end
 
 function ENT:PhysicsUpdate(phys)
@@ -81,4 +82,25 @@ function ENT:Broadcast()
 		net.WriteEntity(self)
 		net.WriteTable(self.lines)
 	net.Broadcast()
+end
+
+function ENT:Think()
+	if self.heldby == 1 then
+		local forwardvec = self:GetForward()
+		local forwardvecstr = util.TypeToString(forwardvec)
+		local forwardvectbl = string.Explode(" ", forwardvecstr, false)
+		local x, y, z = math.Round(forwardvectbl[1]), math.Round(forwardvectbl[2]), math.Round(forwardvectbl[3])
+
+		if x == 1 and y == 0 and z == 0 and self:OBBMins() ~= Vector(-20, 0, 10) then -- Positive Y
+			self:SetCollisionBounds(Vector(-20, 0, -10), Vector(20, 1, 10))
+		end
+
+		if x == -1 and y == 0 and z == 0 and self:OBBMins() ~= Vector(-20, 0, 10) then -- Negative Y
+			self:SetCollisionBounds(Vector(-20, 0, -10), Vector(20, 1, 10))
+		end
+
+		if x == 0 and y == 1 and z == 0 and self:OBBMins() ~= Vector(-20, -10, 0) then -- Pos/Neg Z
+			self:SetCollisionBounds(Vector(-20, -10, 0), Vector(20, 10, 1))
+		end
+	end
 end
