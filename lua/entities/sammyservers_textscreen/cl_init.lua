@@ -1,16 +1,23 @@
 include("shared.lua")
 ENT.RenderGroup = RENDERGROUP_BOTH
 
-local render_range = CreateClientConVar("ss_render_range", 1500, true, false, "Determines the render range for Textscreens. Default 1500")
+local render_convar = CreateClientConVar("ss_render_range", 1500, true, false, "Determines the render range for Textscreens. Default 1500")
+local render_range = render_convar:GetInt() * render_convar:GetInt()
+local textscreenFonts = textscreenFonts
+local screenInfo = {}
 
-for i = 1, 100 do
-	surface.CreateFont("CV" .. tostring(i), {
-		font = "coolvetica",
-		size = i,
-		weight = 400,
-		antialias = false,
-		outline = true
-	})
+cvars.AddChangeCallback("ss_render_range", function(convar_name, value_old, value_new)
+	render_range = tonumber(value_new) * tonumber(value_new)
+end)
+
+local function validFont(f)
+	if textscreenFonts[f] != nil then
+		return textscreenFonts[f]
+	elseif table.HasValue(textscreenFonts, f) then
+		return f
+	else
+		return false
+	end
 end
 
 function ENT:Initialize()
@@ -18,35 +25,24 @@ function ENT:Initialize()
 	self:SetRenderMode(RENDERMODE_TRANSALPHA)
 	self:SetColor(Color(255, 255, 255, 1))
 	self.lines = self.lines or {}
+//	screenInfo[self] = screenInfo[self] or {}
 	net.Start("textscreens_download")
 	net.WriteEntity(self)
 	net.SendToServer()
 end
 
 function ENT:Draw()
-	if self:GetPos():Distance(LocalPlayer():GetPos()) < render_range:GetInt() then
+	if self:GetPos():DistToSqr(LocalPlayer():GetPos()) < render_range and screenInfo[self] != nil then
+		self:DrawModel()
 		local ang = self:GetAngles()
 		local pos = self:GetPos() + ang:Up()
 		local camangle = Angle(ang.p, ang.y, ang.r)
-		self.lines = self.lines or {}
-		local totheight = 0
-
-		for k, v in pairs(self.lines) do
-			v.size = tonumber(v.size) > 100 and 100 or v.size
-			surface.SetFont("CV" .. math.Clamp(v.size, 1, 100))
-			TextWidth, TextHeight = surface.GetTextSize(v.text)
-			self.lines[k].width = TextWidth
-			self.lines[k].height = TextHeight
-			totheight = totheight + TextHeight
-		end
 
 		cam.Start3D2D(pos, camangle, .25)
 		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
-		local curheight = 0
 
-		for k, v in pairs(self.lines) do
-			draw.DrawText(v.text, "CV" .. math.Clamp(v.size, 1, 100), 0, -(totheight / 2) + curheight, v.color, TEXT_ALIGN_CENTER)
-			curheight = curheight + v.height
+		for i=1, screenInfo[self].tableSize do
+			draw.DrawText(screenInfo[self][i].text, screenInfo[self][i].font, 0, screenInfo[self][i].pos, screenInfo[self][i].color, TEXT_ALIGN_CENTER)
 		end
 
 		render.PopFilterMin()
@@ -54,11 +50,9 @@ function ENT:Draw()
 		camangle:RotateAroundAxis(camangle:Right(), 180)
 		cam.Start3D2D(pos, camangle, .25)
 		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
-		local curheight = 0
 
-		for k, v in pairs(self.lines) do
-			draw.DrawText(v.text, "CV" .. math.Clamp(v.size, 1, 100), 0, -(totheight / 2) + curheight, v.color, TEXT_ALIGN_CENTER)
-			curheight = curheight + v.height
+		for i=1, screenInfo[self].tableSize do
+			draw.DrawText(screenInfo[self][i].text, screenInfo[self][i].font, 0, screenInfo[self][i].pos, screenInfo[self][i].color, TEXT_ALIGN_CENTER)
 		end
 
 		render.PopFilterMin()
@@ -73,10 +67,48 @@ end
 function ENT:Think()
 end
 
+function ENT:OnRemove()
+	screenInfo[self] = nil
+end
+
 net.Receive("textscreens_update", function(len)
 	local ent = net.ReadEntity()
 
 	if IsValid(ent) and ent:GetClass() == "sammyservers_textscreen" then
-		ent.lines = net.ReadTable()
+
+		local t = net.ReadTable()
+		local t2 = {}
+		local curheight = 0
+		local totheight = 0
+
+		ent.lines = t
+
+		for i=1, #t do
+			t2[i] = {}
+			// Text
+			t2[i].text = t[i].text
+			// Colour
+			t2[i].color = t[i].color
+			// Font
+			t2[i].font = (validFont(t[i].font) or textscreenFonts[1]) .. t[i].size
+			// Textsize
+			surface.SetFont(t2[i].font)
+			local TextWidth, TextHeight = surface.GetTextSize(t2[i].text)
+			// Pos
+			totheight = totheight + TextHeight
+			t2[i].height = TextHeight
+		end
+
+		for i=1, #t do
+			t2[i].pos = -(totheight / 2) + curheight
+			curheight = curheight + t2[i].height
+		end
+
+		t2.tableSize = #t
+
+//		PrintTable(t2)
+
+		screenInfo[ent] = t2
+
 	end
 end)
