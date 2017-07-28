@@ -6,6 +6,7 @@ local textBox = {}
 local lineLabels = {}
 local labels = {}
 local sliders = {}
+local textscreenFonts = textscreenFonts
 
 for i = 1, 5 do
 	TOOL.ClientConVar["text" .. i] = ""
@@ -14,6 +15,7 @@ for i = 1, 5 do
 	TOOL.ClientConVar["g" .. i] = 255
 	TOOL.ClientConVar["b" .. i] = 255
 	TOOL.ClientConVar["a" .. i] = 255
+	TOOL.ClientConVar["font" .. i] = 1
 end
 
 cleanup.Register("textscreens")
@@ -64,7 +66,9 @@ function TOOL:LeftClick(tr)
 				tonumber(self:GetClientInfo("b"..i)),
 				tonumber(self:GetClientInfo("a"..i))
 			),
-			tonumber(self:GetClientInfo("size"..i))
+			tonumber(self:GetClientInfo("size"..i)),
+			-- font
+			tonumber(self:GetClientInfo("font"..i))
 		)
 	end
 
@@ -97,7 +101,9 @@ function TOOL:RightClick(tr)
 					tonumber(self:GetClientInfo("b"..i)), 
 					tonumber(self:GetClientInfo("a"..i))
 				),
-				tonumber(self:GetClientInfo("size"..i))
+				tonumber(self:GetClientInfo("size"..i)),
+				-- font
+				tonumber(self:GetClientInfo("font"..i))
 			)
 		end
 
@@ -119,6 +125,7 @@ function TOOL:Reload(tr)
 		RunConsoleCommand("textscreen_a" .. i, linedata.color.a)
 		RunConsoleCommand("textscreen_size" .. i, linedata.size)
 		RunConsoleCommand("textscreen_text" .. i, linedata.text)
+		RunConsoleCommand("textscreen_font" .. i, linedata.font)
 	end
 
 	return true
@@ -150,9 +157,19 @@ function TOOL.BuildCPanel(CPanel)
 		Description = "#tool.textscreen.desc"
 	})
 
-	CPanel:AddControl("Label", {
-		Text = "By NodeCraft.com - affordable, high performance game servers!"
-	})
+	local changefont
+	local fontnum = 1
+	local fontsize = {}
+
+	for i=1, 5 do
+		fontsize[i] = 20
+	end
+
+	cvars.AddChangeCallback("textscreen_font1", function(convar_name, value_old, value_new)
+		fontnum = tonumber(value_new) or 1
+		local font = string.Left(textscreenFonts[fontnum], 8) == "Screens_" and string.TrimLeft(textscreenFonts[fontnum], "Screens_") or textscreenFonts[fontnum]
+		changefont:SetText("Change font (" .. font .. ")")
+	end)
 
 	resetall = vgui.Create("DButton", resetbuttons)
 	resetall:SetSize(100, 25)
@@ -174,6 +191,8 @@ function TOOL.BuildCPanel(CPanel)
 			for i = 1, 5 do
 				RunConsoleCommand("textscreen_size" .. i, 20)
 				sliders[i]:SetValue(20)
+				labels[i]:SetText("")
+				fontsize[i] = 20
 			end
 		end)
 
@@ -181,6 +200,8 @@ function TOOL.BuildCPanel(CPanel)
 			for i = 1, 5 do
 				RunConsoleCommand("textscreen_text" .. i, "")
 				textBox[i]:SetValue("")
+				labels[i]:SetText("")
+				fontsize[i] = 20
 			end
 		end)
 
@@ -193,7 +214,12 @@ function TOOL.BuildCPanel(CPanel)
 				RunConsoleCommand("textscreen_size" .. i, 20)
 				sliders[i]:SetValue(20)
 				RunConsoleCommand("textscreen_text" .. i, "")
+				RunConsoleCommand("textscreen_font" .. i, 1)
 				textBox[i]:SetValue("")
+				labels[i]:SetText("")
+				changefont:SetText("Change font")
+				fontnum = 1
+				fontsize[i] = 20
 			end
 		end)
 
@@ -217,7 +243,10 @@ function TOOL.BuildCPanel(CPanel)
 				RunConsoleCommand("textscreen_size" .. i, 20)
 				sliders[i]:SetValue(20)
 				RunConsoleCommand("textscreen_text" .. i, "")
+				RunConsoleCommand("textscreen_font" .. i, 1)
 				textBox[i]:SetValue("")
+				labels[i]:SetText("")
+				fontsize[i] = 20
 			end)
 		end
 
@@ -230,7 +259,12 @@ function TOOL.BuildCPanel(CPanel)
 				RunConsoleCommand("textscreen_size" .. i, 20)
 				sliders[i]:SetValue(20)
 				RunConsoleCommand("textscreen_text" .. i, "")
+				RunConsoleCommand("textscreen_font" .. i, 1)
 				textBox[i]:SetValue("")
+				labels[i]:SetText("")
+				changefont:SetText("Change font")
+				fontnum = 1
+				fontsize[i] = 20
 			end
 		end)
 
@@ -238,6 +272,30 @@ function TOOL.BuildCPanel(CPanel)
 	end
 
 	CPanel:AddItem(resetline)
+
+	// Change font
+	changefont = vgui.Create("DButton")
+	changefont:SetSize(100, 25)
+	changefont:SetText("Change font (" .. textscreenFonts[1] .. ")" )
+
+	changefont.DoClick = function()
+		local menu = DermaMenu()
+
+		for i = 1, #textscreenFonts do
+			local font = string.Left(textscreenFonts[i], 8) == "Screens_" and string.TrimLeft(textscreenFonts[i], "Screens_") or textscreenFonts[i]
+			menu:AddOption(font, function()
+				for o=1, 5 do
+					RunConsoleCommand("textscreen_font" .. o, i)
+				end
+				changefont:SetText("Change font (" .. font .. ")")
+				fontnum = i
+			end)
+		end
+
+		menu:Open()
+	end
+
+	CPanel:AddItem(changefont)
 
 	MakePresetControl(CPanel, "textscreen")
 
@@ -268,8 +326,9 @@ function TOOL.BuildCPanel(CPanel)
 		sliders[i]:SetConVar("textscreen_size" .. i)
 
 		sliders[i].OnValueChanged = function(panel, value)
-			labels[i]:SetFont("CV" .. math.Round(value))
-			labels[i]:SetHeight(tonumber(value))
+			fontsize[i] = math.Round(tonumber(value))
+			labels[i]:SetFont(textscreenFonts[fontnum] .. fontsize[i])
+			labels[i]:SetHeight(fontsize[i])
 		end
 
 		CPanel:AddItem(sliders[i])
@@ -290,7 +349,7 @@ function TOOL.BuildCPanel(CPanel)
 			Description = "Line " .. i
 		})
 
-		labels[i]:SetFont("Default")
+		labels[i]:SetFont(textscreenFonts[fontnum] .. fontsize[i] or "Default")
 		labels[i]:SetAutoStretchVertical(true)
 		labels[i]:SetDisabled(true)
 
@@ -303,6 +362,10 @@ function TOOL.BuildCPanel(CPanel)
 					GetConVar("textscreen_a" .. i):GetInt()
 				)
 			)
+			labels[i]:SetFont(textscreenFonts[fontnum] .. fontsize[i] or "Default")
+			local text = GetConVar("textscreen_text" .. i):GetString()
+			labels[i]:SetText(text)
+			textBox[i]:SetValue(text)
 		end
 	end
 end
