@@ -1,6 +1,8 @@
 if SERVER then
 	AddCSLuaFile()
-	CreateConVar("sbox_maxtextscreens", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
+	AddCSLuaFile("textscreens_config.lua")
+	include("textscreens_config.lua")
+	CreateConVar("sbox_maxtextscreens", "100", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 	CreateConVar("ss_call_to_home", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
 	local version = "1.1.0"
@@ -118,6 +120,8 @@ if SERVER then
 end
 
 if CLIENT then
+	include("textscreens_config.lua")
+
 	properties.Add("addPermaScreen", {
 		MenuLabel = "Make perma textscreen",
 		Order = 2001,
