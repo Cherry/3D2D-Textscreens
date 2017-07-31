@@ -1,5 +1,4 @@
 include("shared.lua")
-ENT.RenderGroup = RENDERGROUP_BOTH
 
 local render_convar = CreateClientConVar("ss_render_range", 1500, true, false, "Determines the render range for Textscreens. Default 1500")
 local render_range = render_convar:GetInt() * render_convar:GetInt() --We multiply this is that we can use DistToSqr instead of Distance so we don't need to workout the square root all the time
@@ -22,8 +21,7 @@ end
 
 function ENT:Initialize()
 	self:SetMaterial("models/effects/vol_light001")
-	self:SetRenderMode(RENDERMODE_TRANSALPHA)
-	self:SetColor(Color(255, 255, 255, 1))
+	self:SetRenderMode(RENDERMODE_NONE)
 	self.lines = self.lines or {}
 	net.Start("textscreens_download")
 	net.WriteEntity(self)
@@ -32,7 +30,6 @@ end
 
 function ENT:Draw()
 	if self:GetPos():DistToSqr(LocalPlayer():GetPos()) < render_range and screenInfo[self] != nil then
-		self:DrawModel()
 		local ang = self:GetAngles()
 		local pos = self:GetPos() + ang:Up()
 		local camangle = Angle(ang.p, ang.y, ang.r)
@@ -59,13 +56,6 @@ function ENT:Draw()
 	end
 end
 
-function ENT:DrawTranslucent()
-	self:Draw()
-end
-
-function ENT:Think()
-end
-
 function ENT:OnRemove()
 	screenInfo[self] = nil
 end
@@ -79,8 +69,9 @@ net.Receive("textscreens_update", function(len)
 		local t2 = {}
 		local curheight = 0
 		local totheight = 0
+		local font
 
-		ent.lines = t
+		ent.lines = t -- Incase an addon or something wants to read the information.
 
 		for i=1, #t do
 			t2[i] = {}
