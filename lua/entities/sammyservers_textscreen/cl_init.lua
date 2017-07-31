@@ -2,7 +2,7 @@ include("shared.lua")
 ENT.RenderGroup = RENDERGROUP_BOTH
 
 local render_convar = CreateClientConVar("ss_render_range", 1500, true, false, "Determines the render range for Textscreens. Default 1500")
-local render_range = render_convar:GetInt() * render_convar:GetInt()
+local render_range = render_convar:GetInt() * render_convar:GetInt() --We multiply this is that we can use DistToSqr instead of Distance so we don't need to workout the square root all the time
 local textscreenFonts = textscreenFonts
 local screenInfo = {}
 
@@ -25,7 +25,6 @@ function ENT:Initialize()
 	self:SetRenderMode(RENDERMODE_TRANSALPHA)
 	self:SetColor(Color(255, 255, 255, 1))
 	self.lines = self.lines or {}
-//	screenInfo[self] = screenInfo[self] or {}
 	net.Start("textscreens_download")
 	net.WriteEntity(self)
 	net.SendToServer()
@@ -105,8 +104,6 @@ net.Receive("textscreens_update", function(len)
 		end
 
 		t2.tableSize = #t
-
-//		PrintTable(t2)
 
 		screenInfo[ent] = t2
 
