@@ -23,7 +23,6 @@ local function SearchForScreens()
 	local plyPos = IsValid(LocalPlayer()) and LocalPlayer():GetPos() or Vector(0, 0, 0)
 	for self, v in pairs(screenInfo) do
 		if IsValid(self) and self:GetPos():DistToSqr(plyPos) < render_range then
-			//table.insert(new, self)
 			table.insert(new, {self, self:GetPos():DistToSqr(plyPos)})
 		end
 	end
