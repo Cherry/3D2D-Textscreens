@@ -65,7 +65,7 @@ if SERVER then
 				textScreen:SetMoveType(MOVETYPE_NONE)
 
 				for k, v in pairs(v.lines or {}) do
-					textScreen:SetLine(k, v.text, Color(v.color.r, v.color.g, v.color.b, v.color.a), v.size)
+					textScreen:SetLine(k, v.text, Color(v.color.r, v.color.g, v.color.b, v.color.a), v.size, v.font)
 				end
 
 				textScreen:SetIsPersisted(true)
