@@ -22,8 +22,12 @@ local function SearchForScreens()
 	local new = {}
 	local plyPos = IsValid(LocalPlayer()) and LocalPlayer():GetPos() or Vector(0, 0, 0)
 	for self, v in pairs(screenInfo) do
-		if IsValid(self) and self:GetPos():DistToSqr(plyPos) < render_range then
-			table.insert(new, {self, self:GetPos():DistToSqr(plyPos)})
+		if IsValid(self) then
+			if self:GetPos():DistToSqr(plyPos) < render_range then
+				table.insert(new, {self, self:GetPos():DistToSqr(plyPos)})
+			end
+		else
+			screenInfo[self] = nil
 		end
 	end
 	table.sort(new, function(a, b) return a[2] > b[2] end) --Draw order fix although this won't work all the time with long text
@@ -40,7 +44,6 @@ end, "3D2DScreens")
 cvars.AddChangeCallback("ss_render_refresh", function(convar_name, value_old, value_new)
 	render_refresh = tonumber(value_new)
 	timer.Create("FindSammyServers3D2DTextScreens", render_refresh, 0, SearchForScreens)
-	print("Created timer with " .. render_refresh)
 end, "3D2DScreens")
 
 timer.Create("FindSammyServers3D2DTextScreens", render_refresh, 0, SearchForScreens)
@@ -87,10 +90,6 @@ hook.Add( "PostDrawTranslucentRenderables", "SammyServers3D2DTextScreens", funct
 	end
 end)
 
-function ENT:OnRemove()
-	screenInfo[self] = nil
-end
-
 local function AddDrawingInfo(ent, t)
 	local t2 = {}
 	local curheight = 0
@@ -132,7 +131,7 @@ net.Receive("textscreens_update", function(len)
 
 		ent.lines = t -- Incase an addon or something wants to read the information.
 
-		AddDrawingInfo(ent, t) -- Runs calculations so drawing doesn't have to
+		AddDrawingInfo(ent, t)
 
 		// Add to table to remove the delay from the timer
 		if ent:GetPos():DistToSqr(LocalPlayer():GetPos()) < render_range then
