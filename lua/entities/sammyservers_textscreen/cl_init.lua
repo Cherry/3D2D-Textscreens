@@ -53,6 +53,10 @@ function ENT:Initialize()
 	net.SendToServer()
 end
 
+function ENT:Draw()
+
+end
+
 hook.Add( "PostDrawTranslucentRenderables", "SammyServers3D2DTextScreens", function()
 	for k, self in ipairs(toDraw) do
 		if IsValid(self) and screenInfo[self] != nil then
