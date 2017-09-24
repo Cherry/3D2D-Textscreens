@@ -26,7 +26,7 @@ local function SearchForScreens()
 			table.insert(new, {self, self:GetPos():DistToSqr(plyPos)})
 		end
 	end
-	table.sort(new, function( a, b ) return a[2] > b[2] end) --Draw order fix although this won't work all the time with long text
+	table.sort(new, function(a, b) return a[2] > b[2] end) --Draw order fix although this won't work all the time with long text
 	for i=1, #new do
 		new[i] = new[i][1]
 	end
