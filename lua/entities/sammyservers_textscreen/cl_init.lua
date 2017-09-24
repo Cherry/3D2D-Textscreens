@@ -48,7 +48,6 @@ timer.Create("FindSammyServers3D2DTextScreens", render_refresh, 0, SearchForScre
 function ENT:Initialize()
 	self:SetMaterial("models/effects/vol_light001")
 	self:SetRenderMode(RENDERMODE_NONE)
-	self.lines = self.lines or {}
 	net.Start("textscreens_download")
 	net.WriteEntity(self)
 	net.SendToServer()
