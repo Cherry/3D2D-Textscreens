@@ -47,7 +47,7 @@ hook.Add("CanTool", "textScreensPreventTools", textScreenCanTool)
 util.AddNetworkString("textscreens_update")
 util.AddNetworkString("textscreens_download")
 
-function ENT:SetLine(line, text, color, size)
+function ENT:SetLine(line, text, color, size, font)
 	if string.sub(text, 1, 1) == "#" then
 		text = string.sub(text, 2)
 	end
@@ -55,11 +55,16 @@ function ENT:SetLine(line, text, color, size)
 		text = string.sub(text, 1, 180) .. "..."
 	end
 
+	size = math.Clamp(size, 0, 100)
+
+	font = textscreenFonts[font] != nil and font or 1
+
 	self.lines = self.lines or {}
 	self.lines[tonumber(line)] = {
 		["text"] = text,
 		["color"] = color,
-		["size"] = size
+		["size"] = size,
+		["font"] = font
 	}
 end
 
