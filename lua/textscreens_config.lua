@@ -7,15 +7,17 @@ local function addFont(font, t)
 			surface.CreateFont(font .. i, t)
 		end
 	end
-	
+
 	table.insert(textscreenFonts, font)
 end
 
-/*---------------------------------------------------------------------------
+--[[
+---------------------------------------------------------------------------
 Custom fonts - requires server restart to take affect -- "Screens_" will be removed from the font name in spawnmenu
----------------------------------------------------------------------------*/
+---------------------------------------------------------------------------
+--]]
 
-// Default textscreens font
+-- Default textscreens font
 addFont("Coolvetica outlined", {
 	font = "coolvetica",
 	weight = 400,
@@ -30,7 +32,7 @@ addFont("Coolvetica", {
 	outline = false
 })
 
-// Trebuchet
+-- Trebuchet
 addFont("Screens_Trebuchet outlined", {
 	font = "Trebuchet18",
 	weight = 400,
@@ -45,7 +47,7 @@ addFont("Screens_Trebuchet", {
 	outline = false
 })
 
-// Arial
+-- Arial
 addFont("Screens_Arial outlined", {
 	font = "Arial",
 	weight = 600,
@@ -60,7 +62,7 @@ addFont("Screens_Arial", {
 	outline = false
 })
 
-// Roboto Bk
+-- Roboto Bk
 addFont("Screens_Roboto outlined", {
 	font = "Roboto Bk",
 	weight = 400,
@@ -75,7 +77,7 @@ addFont("Screens_Roboto", {
 	outline = false
 })
 
-// Helvetica
+-- Helvetica
 addFont("Screens_Helvetica outlined", {
 	font = "Helvetica",
 	weight = 400,
@@ -90,7 +92,7 @@ addFont("Screens_Helvetica", {
 	outline = false
 })
 
-// akbar
+-- akbar
 addFont("Screens_akbar outlined", {
 	font = "akbar",
 	weight = 400,
@@ -106,7 +108,7 @@ addFont("Screens_akbar", {
 })
 
 
-// boogaloo
+-- boogaloo
 addFont("Screens_boogaloo outlined", {
 	font = "boogaloo",
 	weight = 400,
@@ -121,7 +123,7 @@ addFont("Screens_boogaloo", {
 	outline = false
 })
 
-// csd
+-- csd
 addFont("Screens_csd outlined", {
 	font = "csd",
 	weight = 400,
@@ -145,7 +147,7 @@ if CLIENT then
 			if string.GetExtensionFromFilename(v) == "ttf" then
 				local font = string.StripExtension(v)
 				if table.HasValue(textscreenFonts, "Screens_" .. font) then continue end
-print("// "  .. font .. "\n" .. [[
+print("-- "  .. font .. "\n" .. [[
 addFont("Screens_ ]] .. font .. [[", {
 	font = font,
 	weight = 400,

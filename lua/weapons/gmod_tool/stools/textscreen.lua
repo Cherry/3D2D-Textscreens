@@ -55,7 +55,7 @@ function TOOL:LeftClick(tr)
 	textScreen:SetAngles(angle)
 	textScreen:Spawn()
 	textScreen:Activate()
-	
+
 	undo.Create("textscreens")
 	undo.AddEntity(textScreen)
 	undo.SetPlayer(ply)
@@ -283,7 +283,7 @@ function TOOL.BuildCPanel(CPanel)
 
 	CPanel:AddItem(resetline)
 
-	// Change font
+	-- Change font
 	changefont = vgui.Create("DButton")
 	changefont:SetSize(100, 25)
 	changefont:SetText("Change font (" .. TrimFontName(fontnum) .. ")" )
