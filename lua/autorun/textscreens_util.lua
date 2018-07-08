@@ -5,7 +5,7 @@ if SERVER then
 	CreateConVar("sbox_maxtextscreens", "100", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 	CreateConVar("ss_call_to_home", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
-	local version = "1.2.0"
+	local version = "1.3.0"
 
 	local function GetOS()
 		if system.IsLinux() then return "linux" end
@@ -21,7 +21,7 @@ if SERVER then
 		timer.Simple(15, function()
 			if GetConVar("ss_call_to_home"):GetInt() == 0 then return end
 
-			http.Post("https://sammyservers.com/misc/index.php", {
+			http.Post("https://jross.me/textscreens/analytics.php", {
 				["operating_system"] = GetOS(),
 				["server_dedicated"] = game.IsDedicated() and "true" or "false",
 				["server_name"] = GetHostName(),

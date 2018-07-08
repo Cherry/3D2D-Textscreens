@@ -7,150 +7,147 @@ local function addFont(font, t)
 			surface.CreateFont(font .. i, t)
 		end
 	end
-	
+
 	table.insert(textscreenFonts, font)
 end
 
-/*---------------------------------------------------------------------------
+--[[
+---------------------------------------------------------------------------
 Custom fonts - requires server restart to take affect -- "Screens_" will be removed from the font name in spawnmenu
----------------------------------------------------------------------------*/
+---------------------------------------------------------------------------
+--]]
 
-// Default textscreens font
-local function addFonts()
-	textscreenFonts = {}
+-- Default textscreens font
+addFont("Coolvetica outlined", {
+	font = "coolvetica",
+	weight = 400,
+	antialias = false,
+	outline = true
+})
 
-	addFont("Coolvetica outlined", {
-		font = "coolvetica",
-		weight = 400,
-		antialias = false,
-		outline = true
-	})
+addFont("Coolvetica", {
+	font = "coolvetica",
+	weight = 400,
+	antialias = false,
+	outline = false
+})
 
-	addFont("Coolvetica", {
-		font = "coolvetica",
-		weight = 400,
-		antialias = false,
-		outline = false
-	})
+-- Trebuchet
+addFont("Screens_Trebuchet outlined", {
+	font = "Trebuchet18",
+	weight = 400,
+	antialias = false,
+	outline = true
+})
 
-	// Trebuchet
-	addFont("Screens_Trebuchet outlined", {
-		font = "Trebuchet18",
-		weight = 400,
-		antialias = false,
-		outline = true
-	})
+addFont("Screens_Trebuchet", {
+	font = "Trebuchet18",
+	weight = 400,
+	antialias = false,
+	outline = false
+})
 
-	addFont("Screens_Trebuchet", {
-		font = "Trebuchet18",
-		weight = 400,
-		antialias = false,
-		outline = false
-	})
+-- Arial
+addFont("Screens_Arial outlined", {
+	font = "Arial",
+	weight = 600,
+	antialias = false,
+	outline = true
+})
 
-	// Arial
-	addFont("Screens_Arial outlined", {
-		font = "Arial",
-		weight = 600,
-		antialias = false,
-		outline = true
-	})
+addFont("Screens_Arial", {
+	font = "Arial",
+	weight = 600,
+	antialias = false,
+	outline = false
+})
 
-	addFont("Screens_Arial", {
-		font = "Arial",
-		weight = 600,
-		antialias = false,
-		outline = false
-	})
+-- Roboto Bk
+addFont("Screens_Roboto outlined", {
+	font = "Roboto Bk",
+	weight = 400,
+	antialias = false,
+	outline = true
+})
 
-	// Roboto Bk
-	addFont("Screens_Roboto outlined", {
-		font = "Roboto Bk",
-		weight = 400,
-		antialias = false,
-		outline = true
-	})
+addFont("Screens_Roboto", {
+	font = "Roboto Bk",
+	weight = 400,
+	antialias = false,
+	outline = false
+})
 
-	addFont("Screens_Roboto", {
-		font = "Roboto Bk",
-		weight = 400,
-		antialias = false,
-		outline = false
-	})
+-- Helvetica
+addFont("Screens_Helvetica outlined", {
+	font = "Helvetica",
+	weight = 400,
+	antialias = false,
+	outline = true
+})
 
-	// Helvetica
-	addFont("Screens_Helvetica outlined", {
-		font = "Helvetica",
-		weight = 400,
-		antialias = false,
-		outline = true
-	})
+addFont("Screens_Helvetica", {
+	font = "Helvetica",
+	weight = 400,
+	antialias = false,
+	outline = false
+})
 
-	addFont("Screens_Helvetica", {
-		font = "Helvetica",
-		weight = 400,
-		antialias = false,
-		outline = false
-	})
+-- akbar
+addFont("Screens_akbar outlined", {
+	font = "akbar",
+	weight = 400,
+	antialias = false,
+	outline = true
+})
 
-	// akbar
-	addFont("Screens_akbar outlined", {
-		font = "akbar",
-		weight = 400,
-		antialias = false,
-		outline = true
-	})
-
-	addFont("Screens_akbar", {
-		font = "akbar",
-		weight = 400,
-		antialias = false,
-		outline = false
-	})
+addFont("Screens_akbar", {
+	font = "akbar",
+	weight = 400,
+	antialias = false,
+	outline = false
+})
 
 
-	// boogaloo
-	addFont("Screens_boogaloo outlined", {
-		font = "boogaloo",
-		weight = 400,
-		antialias = false,
-		outline = true
-	})
+-- boogaloo
+addFont("Screens_boogaloo outlined", {
+	font = "boogaloo",
+	weight = 400,
+	antialias = false,
+	outline = true
+})
 
-	addFont("Screens_boogaloo", {
-		font = "boogaloo",
-		weight = 400,
-		antialias = false,
-		outline = false
-	})
+addFont("Screens_boogaloo", {
+	font = "boogaloo",
+	weight = 400,
+	antialias = false,
+	outline = false
+})
 
-	// csd
-	addFont("Screens_csd outlined", {
-		font = "csd",
-		weight = 400,
-		antialias = false,
-		outline = true
-	})
+-- csd
+addFont("Screens_csd outlined", {
+	font = "csd",
+	weight = 400,
+	antialias = false,
+	outline = true
+})
 
-	addFont("Screens_csd", {
-		font = "csd",
-		weight = 400,
-		antialias = false,
-		outline = false
-	})
-end
-addFonts()
+addFont("Screens_csd", {
+	font = "csd",
+	weight = 400,
+	antialias = false,
+	outline = false
+})
 
 if CLIENT then
 
-	local function showFonts(path)
+	local function addFonts(path)
 		local files, folders = file.Find("resource/fonts/" .. path .. "*", "MOD")
 
 		for k, v in ipairs(files) do
 			if string.GetExtensionFromFilename(v) == "ttf" then
 				local font = string.StripExtension(v)
 				if table.HasValue(textscreenFonts, "Screens_" .. font) then continue end
-print("// "  .. font .. "\n" .. [[
+print("-- "  .. font .. "\n" .. [[
 addFont("Screens_ ]] .. font .. [[", {
 	font = font,
 	weight = 400,
@@ -162,15 +159,12 @@ addFont("Screens_ ]] .. font .. [[", {
 		end
 
 		for k, v in ipairs(folders) do
-			showFonts(path .. v .. "/")
+			addFonts(path .. v .. "/")
 		end
 	end
 
 	concommand.Add("get_fonts", function(ply)
-		showFonts("")
+		addFonts("")
 	end)
 
-	// Font fix from darkrp
-	hook.Add("InitPostEntity", "3D2DTextScreens_LoadFonts", addFonts)
-	
 end

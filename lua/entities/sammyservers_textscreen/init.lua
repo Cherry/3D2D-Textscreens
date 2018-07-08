@@ -55,7 +55,7 @@ function ENT:SetLine(line, text, color, size, font)
 		text = string.sub(text, 1, 180) .. "..."
 	end
 
-	size = math.Clamp(size, 0, 100)
+	size = math.Clamp(size, 1, 100)
 
 	font = textscreenFonts[font] != nil and font or 1
 

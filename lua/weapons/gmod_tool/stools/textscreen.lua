@@ -56,31 +56,28 @@ function TOOL:LeftClick(tr)
 	textScreen:Spawn()
 	textScreen:Activate()
 
-	for i = 1, 5 do
-		textScreen:SetLine(
-			i, -- Line
-			self:GetClientInfo("text"..i), -- text
-			Color( -- Color
-				tonumber(self:GetClientInfo("r"..i)),
-				tonumber(self:GetClientInfo("g"..i)),
-				tonumber(self:GetClientInfo("b"..i)),
-				tonumber(self:GetClientInfo("a"..i))
-			),
-			tonumber(self:GetClientInfo("size"..i)),
-			-- font
-			tonumber(self:GetClientInfo("font"..i))
-		)
-	end
-
-	-- Line
-	-- text
-	-- Color
 	undo.Create("textscreens")
 	undo.AddEntity(textScreen)
 	undo.SetPlayer(ply)
 	undo.Finish()
 	ply:AddCount("textscreens", textScreen)
 	ply:AddCleanup("textscreens", textScreen)
+
+	for i = 1, 5 do
+		textScreen:SetLine(
+			i, -- Line
+			self:GetClientInfo("text"..i) or "", -- text
+			Color( -- Color
+				tonumber(self:GetClientInfo("r"..i)) or 255,
+				tonumber(self:GetClientInfo("g"..i)) or 255,
+				tonumber(self:GetClientInfo("b"..i)) or 255,
+				tonumber(self:GetClientInfo("a"..i)) or 255
+			),
+			tonumber(self:GetClientInfo("size"..i)) or 20,
+			-- font
+			tonumber(self:GetClientInfo("font"..i)) or 1
+		)
+	end
 
 	return true
 end
@@ -96,14 +93,14 @@ function TOOL:RightClick(tr)
 				i, -- Line
 				tostring(self:GetClientInfo("text"..i)), -- text
 				Color( -- Color
-					tonumber(self:GetClientInfo("r"..i)), 
-					tonumber(self:GetClientInfo("g"..i)), 
-					tonumber(self:GetClientInfo("b"..i)), 
-					tonumber(self:GetClientInfo("a"..i))
+					tonumber(self:GetClientInfo("r"..i)) or 255, 
+					tonumber(self:GetClientInfo("g"..i)) or 255, 
+					tonumber(self:GetClientInfo("b"..i)) or 255, 
+					tonumber(self:GetClientInfo("a"..i)) or 255
 				),
-				tonumber(self:GetClientInfo("size"..i)),
+				tonumber(self:GetClientInfo("size"..i)) or 20,
 				-- font
-				tonumber(self:GetClientInfo("font"..i))
+				tonumber(self:GetClientInfo("font"..i)) or 1
 			)
 		end
 
@@ -286,7 +283,7 @@ function TOOL.BuildCPanel(CPanel)
 
 	CPanel:AddItem(resetline)
 
-	// Change font
+	-- Change font
 	changefont = vgui.Create("DButton")
 	changefont:SetSize(100, 25)
 	changefont:SetText("Change font (" .. TrimFontName(fontnum) .. ")" )

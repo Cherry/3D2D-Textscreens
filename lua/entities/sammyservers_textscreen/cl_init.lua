@@ -98,16 +98,16 @@ local function AddDrawingInfo(ent, t)
 
 	for i=1, #t do
 		t2[i] = {}
-		// Text
+		-- Text
 		t2[i].text = t[i].text
-		// Colour
+		-- Colour
 		t2[i].color = t[i].color
-		// Font
+		-- Font
 		t2[i].font = (ValidFont(t[i].font) or textscreenFonts[1]) .. t[i].size
-		// Textsize
+		-- Textsize
 		surface.SetFont(t2[i].font)
 		local TextWidth, TextHeight = surface.GetTextSize(t2[i].text)
-		// Pos
+		-- Pos
 		totheight = totheight + TextHeight
 		t2[i].height = TextHeight
 	end
@@ -133,7 +133,7 @@ net.Receive("textscreens_update", function(len)
 
 		AddDrawingInfo(ent, t)
 
-		// Add to table to remove the delay from the timer
+		-- Add to table to remove the delay from the timer
 		if ent:GetPos():DistToSqr(LocalPlayer():GetPos()) < render_range then
 			table.insert(toDraw, ent)
 		end
@@ -141,7 +141,7 @@ net.Receive("textscreens_update", function(len)
 	end
 end)
 
-// Auto refresh
+-- Auto refresh
 if IsValid(LocalPlayer()) then
 	local screens = ents.FindByClass("sammyservers_textscreen")
 	for k, v in ipairs(screens) do
