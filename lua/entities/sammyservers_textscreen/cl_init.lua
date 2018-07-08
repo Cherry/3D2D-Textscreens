@@ -60,32 +60,59 @@ function ENT:Draw()
 
 end
 
+-- Return whether the first position is in front of the second with the given direction
+local function isInFront(entPos, plyShootPos, direction)
+    local product = (entPos.x - plyShootPos.x) * direction.x +
+                      (entPos.y - plyShootPos.y) * direction.y +
+                      (entPos.z - plyShootPos.z) * direction.z
+    return (product < 0)
+end
+
+local plyShootPos, ang, pos, camangle, showFront -- Less variables being created each frame
 hook.Add( "PostDrawTranslucentRenderables", "SammyServers3D2DTextScreens", function()
+
+	-- Cache the shoot pos for this frame
+	if IsValid(LocalPlayer()) then
+		plyShootPos = LocalPlayer():GetShootPos()
+	else
+		return
+	end
+
 	for k, self in ipairs(toDraw) do
 		if IsValid(self) and screenInfo[self] != nil then
-			local ang = self:GetAngles()
-			local pos = self:GetPos() + ang:Up()
-			local camangle = Angle(ang.p, ang.y, ang.r)
+			ang = self:GetAngles()
+			pos = self:GetPos() + ang:Up()
+			camangle = Angle(ang.p, ang.y, ang.r)
 
-			cam.Start3D2D(pos, camangle, .25)
-			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+			-- Is the front of the screen facing us or the back?
+			showFront = isInFront(pos, plyShootPos, ang:Up())
 
-			for i=1, screenInfo[self].tableSize do
-				draw.DrawText(screenInfo[self][i].text, screenInfo[self][i].font, 0, screenInfo[self][i].pos, screenInfo[self][i].color, TEXT_ALIGN_CENTER)
+			-- Draw the front of the screen
+			if showFront then
+				cam.Start3D2D(pos, camangle, .25)
+					render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
+					for i=1, screenInfo[self].tableSize do
+						draw.DrawText(screenInfo[self][i].text, screenInfo[self][i].font, 0, screenInfo[self][i].pos, screenInfo[self][i].color, TEXT_ALIGN_CENTER)
+					end
+
+					render.PopFilterMin()
+				cam.End3D2D()
 			end
 
-			render.PopFilterMin()
-			cam.End3D2D()
-			camangle:RotateAroundAxis(camangle:Right(), 180)
-			cam.Start3D2D(pos, camangle, .25)
-			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+			-- Draw the back of the screen
+			if not showFront then
+				camangle:RotateAroundAxis(camangle:Right(), 180)
+				cam.Start3D2D(pos, camangle, .25)
+					render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 
-			for i=1, screenInfo[self].tableSize do
-				draw.DrawText(screenInfo[self][i].text, screenInfo[self][i].font, 0, screenInfo[self][i].pos, screenInfo[self][i].color, TEXT_ALIGN_CENTER)
+					for i=1, screenInfo[self].tableSize do
+						draw.DrawText(screenInfo[self][i].text, screenInfo[self][i].font, 0, screenInfo[self][i].pos, screenInfo[self][i].color, TEXT_ALIGN_CENTER)
+					end
+
+					render.PopFilterMin()
+				cam.End3D2D()
 			end
-
-			render.PopFilterMin()
-			cam.End3D2D()
 		end
 	end
 end)
