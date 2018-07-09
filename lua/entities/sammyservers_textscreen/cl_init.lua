@@ -72,11 +72,7 @@ local plyShootPos, ang, pos, camangle, showFront -- Less variables being created
 hook.Add( "PostDrawTranslucentRenderables", "SammyServers3D2DTextScreens", function()
 
 	-- Cache the shoot pos for this frame
-	if IsValid(LocalPlayer()) then
-		plyShootPos = LocalPlayer():GetShootPos()
-	else
-		return
-	end
+	plyShootPos = LocalPlayer():GetShootPos()
 
 	for k, self in ipairs(toDraw) do
 		if IsValid(self) and screenInfo[self] != nil then
@@ -98,10 +94,8 @@ hook.Add( "PostDrawTranslucentRenderables", "SammyServers3D2DTextScreens", funct
 
 					render.PopFilterMin()
 				cam.End3D2D()
-			end
-
+			else
 			-- Draw the back of the screen
-			if not showFront then
 				camangle:RotateAroundAxis(camangle:Right(), 180)
 				cam.Start3D2D(pos, camangle, .25)
 					render.PushFilterMin(TEXFILTER.ANISOTROPIC)
