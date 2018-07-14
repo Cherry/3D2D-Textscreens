@@ -8,6 +8,14 @@ local textscreenFonts = textscreenFonts
 local screenInfo = {}
 local toDraw = {}
 
+-- ENUM type things faster faster table indexing
+local FONT = 1
+local TEXT = 2
+local POSX = 3
+local POSY = 4
+local COL = 5
+local LEN = 6
+
 local function ValidFont(f)
 	if textscreenFonts[f] != nil then
 		return textscreenFonts[f]
@@ -61,14 +69,15 @@ function ENT:Draw()
 end
 
 -- Return whether the first position is in front of the second with the given direction
-local function isInFront(entPos, plyShootPos, direction)
-    local product = (entPos.x - plyShootPos.x) * direction.x +
+local product
+local function IsInFront(entPos, plyShootPos, direction)
+    product = (entPos.x - plyShootPos.x) * direction.x +
                       (entPos.y - plyShootPos.y) * direction.y +
                       (entPos.z - plyShootPos.z) * direction.z
     return (product < 0)
 end
 
-local plyShootPos, ang, pos, camangle, showFront -- Less variables being created each frame
+local plyShootPos, ang, pos, camangle, showFront, data -- Less variables being created each frame
 hook.Add( "PostDrawTranslucentRenderables", "SammyServers3D2DTextScreens", function()
 
 	-- Cache the shoot pos for this frame
@@ -79,17 +88,26 @@ hook.Add( "PostDrawTranslucentRenderables", "SammyServers3D2DTextScreens", funct
 			ang = self:GetAngles()
 			pos = self:GetPos() + ang:Up()
 			camangle = Angle(ang.p, ang.y, ang.r)
+			data = screenInfo[self]
 
 			-- Is the front of the screen facing us or the back?
-			showFront = isInFront(pos, plyShootPos, ang:Up())
+			showFront = IsInFront(pos, plyShootPos, ang:Up())
 
 			-- Draw the front of the screen
 			if showFront then
 				cam.Start3D2D(pos, camangle, .25)
 					render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 
-					for i=1, screenInfo[self].tableSize do
-						draw.DrawText(screenInfo[self][i].text, screenInfo[self][i].font, 0, screenInfo[self][i].pos, screenInfo[self][i].color, TEXT_ALIGN_CENTER)
+					-- Loop through each line
+					for i=1, data[LEN] do
+						-- Font
+						surface.SetFont(data[i][FONT])
+						-- Posistion
+						surface.SetTextPos(data[i][POSX], data[i][POSY])
+						-- Colour
+						surface.SetTextColor(data[i][COL])
+						-- Text
+						surface.DrawText(data[i][TEXT])
 					end
 
 					render.PopFilterMin()
@@ -100,8 +118,16 @@ hook.Add( "PostDrawTranslucentRenderables", "SammyServers3D2DTextScreens", funct
 				cam.Start3D2D(pos, camangle, .25)
 					render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 
-					for i=1, screenInfo[self].tableSize do
-						draw.DrawText(screenInfo[self][i].text, screenInfo[self][i].font, 0, screenInfo[self][i].pos, screenInfo[self][i].color, TEXT_ALIGN_CENTER)
+					-- Loop through each line
+					for i=1, data[LEN] do
+						-- Font
+						surface.SetFont(data[i][FONT])
+						-- Posistion
+						surface.SetTextPos(data[i][POSX], data[i][POSY])
+						-- Colour
+						surface.SetTextColor(data[i][COL])
+						-- Text
+						surface.DrawText(data[i][TEXT])
 					end
 
 					render.PopFilterMin()
@@ -111,36 +137,45 @@ hook.Add( "PostDrawTranslucentRenderables", "SammyServers3D2DTextScreens", funct
 	end
 end)
 
-local function AddDrawingInfo(ent, t)
-	local t2 = {}
-	local curheight = 0
-	local totheight = 0
-	local font
+local function AddDrawingInfo(ent, rawData)
+	local data = {}
+	local textSize = {}
 
-	for i=1, #t do
-		t2[i] = {}
+	local totalHeight = 0
+	local currentHeight = 0
+
+	for i=1, #rawData do
+		-- Setup tables
+		data[i] = {}
+		textSize[i] = {}
 		-- Text
-		t2[i].text = t[i].text
-		-- Colour
-		t2[i].color = t[i].color
+		data[i][TEXT] = rawData[i].text
 		-- Font
-		t2[i].font = (ValidFont(t[i].font) or textscreenFonts[1]) .. t[i].size
-		-- Textsize
-		surface.SetFont(t2[i].font)
-		local TextWidth, TextHeight = surface.GetTextSize(t2[i].text)
-		-- Pos
-		totheight = totheight + TextHeight
-		t2[i].height = TextHeight
+		data[i][FONT] = (ValidFont(rawData[i].font) or textscreenFonts[1]) .. rawData[i].size
+		-- Text size
+		surface.SetFont(data[i][FONT])
+		textSize[i][1], textSize[i][2] = surface.GetTextSize(data[i][TEXT])
+		-- Position
+		totalHeight = totalHeight + textSize[i][2]
+		-- Colour
+		data[i][COL] = Color(rawData[i].color.r, rawData[i].color.g, rawData[i].color.g, 255)
 	end
 
-	for i=1, #t do
-		t2[i].pos = -(totheight / 2) + curheight
-		curheight = curheight + t2[i].height
+	-- Sort out heights
+	for i=1, #rawData do
+		-- The x position at which to draw the text relative to the text screen entity
+		data[i][POSX] = math.ceil(-textSize[i][1] / 2)
+		-- The y position at which to draw the text relative to the text screen entity
+		data[i][POSY] = math.ceil(-(totalHeight / 2) + currentHeight)
+		-- Heights line to lowest, so that everything is central
+		currentHeight = currentHeight + textSize[i][2]
 	end
 
-	t2.tableSize = #t
+	-- Cache the number of lines/length
+	data[LEN] = #data
+	-- Add the new data to our text screen list
+	screenInfo[ent] = data
 
-	screenInfo[ent] = t2
 end
 
 net.Receive("textscreens_update", function(len)
