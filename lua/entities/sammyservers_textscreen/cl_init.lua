@@ -8,7 +8,7 @@ local textscreenFonts = textscreenFonts
 local screenInfo = {}
 local toDraw = {}
 
--- ENUM type things faster faster table indexing
+-- ENUM type things for faster table indexing
 local FONT = 1
 local TEXT = 2
 local POSX = 3
