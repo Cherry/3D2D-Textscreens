@@ -5,6 +5,10 @@ local render_range = render_convar_range:GetInt() * render_convar_range:GetInt()
 local textscreenFonts = textscreenFonts
 local screenInfo = {}
 
+-- Numbers used in conjunction with text width to work out the render bounds
+local widthBoundsDivider = 7.90746682323451
+local heightBoundsDivider = 12.42639392058576
+
 -- ENUM type things for faster table indexing
 local FONT = 1
 local TEXT = 2
@@ -44,7 +48,7 @@ local function IsInFront(entPos, plyShootPos, direction)
 end
 
 local plyShootPos, ang, pos, camangle, showFront, data -- Less variables being created each frame
-function ENT:DrawTranslucent()
+function ENT:Draw()
 	-- Cache the shoot pos for this frame
 	plyShootPos = LocalPlayer():GetShootPos()
 
@@ -105,6 +109,7 @@ local function AddDrawingInfo(ent, rawData)
 	local textSize = {}
 
 	local totalHeight = 0
+	local maxWidth = 0
 	local currentHeight = 0
 
 	for i=1, #rawData do
@@ -118,6 +123,8 @@ local function AddDrawingInfo(ent, rawData)
 		-- Text size
 		surface.SetFont(data[i][FONT])
 		textSize[i][1], textSize[i][2] = surface.GetTextSize(data[i][TEXT])
+		-- Workout max width for render bounds
+		maxWidth = maxWidth > textSize[i][1] and maxWidth or textSize[i][1]
 		-- Position
 		totalHeight = totalHeight + textSize[i][2]
 		-- Colour
@@ -139,6 +146,12 @@ local function AddDrawingInfo(ent, rawData)
 	-- Add the new data to our text screen list
 	screenInfo[ent] = data
 
+	-- Calculate the render bounds
+	local x = maxWidth / widthBoundsDivider
+	local y = currentHeight / heightBoundsDivider + 13 -- Text is above the centre
+
+	-- Setup the render bounds
+	ent:SetRenderBounds(Vector(-x, -y, -1.75), Vector(x, y, 1.75))
 end
 
 net.Receive("textscreens_update", function(len)
