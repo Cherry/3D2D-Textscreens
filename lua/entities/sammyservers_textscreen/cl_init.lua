@@ -4,10 +4,11 @@ local render_convar_range = CreateClientConVar("ss_render_range", 1500, true, fa
 local render_range = render_convar_range:GetInt() * render_convar_range:GetInt() --We multiply this is that we can use DistToSqr instead of Distance so we don't need to workout the square root all the time
 local textscreenFonts = textscreenFonts
 local screenInfo = {}
+local shouldDrawBoth = false
 
 -- Numbers used in conjunction with text width to work out the render bounds
-local widthBoundsDivider = 7.90746682323451
-local heightBoundsDivider = 12.42639392058576
+local widthBoundsDivider = 7.9
+local heightBoundsDivider = 12.4
 
 -- ENUM type things for faster table indexing
 local FONT = 1
@@ -16,6 +17,11 @@ local POSX = 3
 local POSY = 4
 local COL = 5
 local LEN = 6
+
+-- Make ply:ShouldDrawLocalPlayer() never get called more than once a frame
+hook.Add("Think", "ss_should_draw_both_sides", function()
+	shouldDrawBoth = LocalPlayer():ShouldDrawLocalPlayer()
+end)
 
 local function ValidFont(f)
 	if textscreenFonts[f] != nil then
@@ -47,6 +53,27 @@ local function IsInFront(entPos, plyShootPos, direction)
     return (product < 0)
 end
 
+-- Draws the 3D2D text with the given positions, angles and data(text/font/col)
+local function Draw3D2D(ang, pos, camangle, data)
+	cam.Start3D2D(pos, camangle, .25)
+		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
+		-- Loop through each line
+		for i=1, data[LEN] do
+			-- Font
+			surface.SetFont(data[i][FONT])
+			-- Posistion
+			surface.SetTextPos(data[i][POSX], data[i][POSY])
+			-- Colour
+			surface.SetTextColor(data[i][COL])
+			-- Text
+			surface.DrawText(data[i][TEXT])
+		end
+
+		render.PopFilterMin()
+	cam.End3D2D()
+end
+
 local plyShootPos, ang, pos, camangle, showFront, data -- Less variables being created each frame
 function ENT:Draw()
 	-- Cache the shoot pos for this frame
@@ -58,48 +85,23 @@ function ENT:Draw()
 		camangle = Angle(ang.p, ang.y, ang.r)
 		data = screenInfo[self]
 
-		-- Is the front of the screen facing us or the back?
-		showFront = IsInFront(pos, plyShootPos, ang:Up())
-
-		-- Draw the front of the screen
-		if showFront then
-			cam.Start3D2D(pos, camangle, .25)
-				render.PushFilterMin(TEXFILTER.ANISOTROPIC)
-
-				-- Loop through each line
-				for i=1, data[LEN] do
-					-- Font
-					surface.SetFont(data[i][FONT])
-					-- Posistion
-					surface.SetTextPos(data[i][POSX], data[i][POSY])
-					-- Colour
-					surface.SetTextColor(data[i][COL])
-					-- Text
-					surface.DrawText(data[i][TEXT])
-				end
-
-				render.PopFilterMin()
-			cam.End3D2D()
-		else
-		-- Draw the back of the screen
+		-- Should we draw both screens? (Third person/calview drawing fix)
+		if shouldDrawBoth then
+			Draw3D2D(ang, pos, camangle, data)
 			camangle:RotateAroundAxis(camangle:Right(), 180)
-			cam.Start3D2D(pos, camangle, .25)
-				render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+			Draw3D2D(ang, pos, camangle, data)
+		else
+			-- Is the front of the screen facing us or the back?
+			showFront = IsInFront(pos, plyShootPos, ang:Up())
 
-				-- Loop through each line
-				for i=1, data[LEN] do
-					-- Font
-					surface.SetFont(data[i][FONT])
-					-- Posistion
-					surface.SetTextPos(data[i][POSX], data[i][POSY])
-					-- Colour
-					surface.SetTextColor(data[i][COL])
-					-- Text
-					surface.DrawText(data[i][TEXT])
-				end
-
-				render.PopFilterMin()
-			cam.End3D2D()
+			-- Draw the front of the screen
+			if showFront then 
+				Draw3D2D(ang, pos, camangle, data)
+			else
+			-- Draw the back of the screen
+				camangle:RotateAroundAxis(camangle:Right(), 180)
+				Draw3D2D(ang, pos, camangle, data)
+			end
 		end
 	end
 end
