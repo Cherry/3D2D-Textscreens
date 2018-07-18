@@ -1,12 +1,27 @@
 include("shared.lua")
 
 local render_convar_range = CreateClientConVar("ss_render_range", 1500, true, false, "Determines the render range for Textscreens. Default 1500")
-local render_convar_refresh = CreateClientConVar("ss_render_refresh", 0.5, true, false, "Determines the refresh rate for Textscreens. Default 0.5 (seconds)")
 local render_range = render_convar_range:GetInt() * render_convar_range:GetInt() --We multiply this is that we can use DistToSqr instead of Distance so we don't need to workout the square root all the time
-local render_refresh = render_convar_refresh:GetFloat() --Using decimals
 local textscreenFonts = textscreenFonts
 local screenInfo = {}
-local toDraw = {}
+local shouldDrawBoth = false
+
+-- Numbers used in conjunction with text width to work out the render bounds
+local widthBoundsDivider = 7.9
+local heightBoundsDivider = 12.4
+
+-- ENUM type things for faster table indexing
+local FONT = 1
+local TEXT = 2
+local POSX = 3
+local POSY = 4
+local COL = 5
+local LEN = 6
+
+-- Make ply:ShouldDrawLocalPlayer() never get called more than once a frame
+hook.Add("Think", "ss_should_draw_both_sides", function()
+	shouldDrawBoth = LocalPlayer():ShouldDrawLocalPlayer()
+end)
 
 local function ValidFont(f)
 	if textscreenFonts[f] != nil then
@@ -18,35 +33,9 @@ local function ValidFont(f)
 	end
 end
 
-local function SearchForScreens()
-	local new = {}
-	local plyPos = IsValid(LocalPlayer()) and LocalPlayer():GetPos() or Vector(0, 0, 0)
-	for self, v in pairs(screenInfo) do
-		if IsValid(self) then
-			if self:GetPos():DistToSqr(plyPos) < render_range then
-				table.insert(new, {self, self:GetPos():DistToSqr(plyPos)})
-			end
-		else
-			screenInfo[self] = nil
-		end
-	end
-	table.sort(new, function(a, b) return a[2] > b[2] end) --Draw order fix although this won't work all the time with long text
-	for i=1, #new do
-		new[i] = new[i][1]
-	end
-	toDraw = new
-end
-
 cvars.AddChangeCallback("ss_render_range", function(convar_name, value_old, value_new)
 	render_range = tonumber(value_new) * tonumber(value_new)
 end, "3D2DScreens")
-
-cvars.AddChangeCallback("ss_render_refresh", function(convar_name, value_old, value_new)
-	render_refresh = tonumber(value_new)
-	timer.Create("FindSammyServers3D2DTextScreens", render_refresh, 0, SearchForScreens)
-end, "3D2DScreens")
-
-timer.Create("FindSammyServers3D2DTextScreens", render_refresh, 0, SearchForScreens)
 
 function ENT:Initialize()
 	self:SetMaterial("models/effects/vol_light001")
@@ -56,91 +45,115 @@ function ENT:Initialize()
 	net.SendToServer()
 end
 
-function ENT:Draw()
-
-end
-
--- Return whether the first position is in front of the second with the given direction
-local function isInFront(entPos, plyShootPos, direction)
-    local product = (entPos.x - plyShootPos.x) * direction.x +
+local product
+local function IsInFront(entPos, plyShootPos, direction)
+    product = (entPos.x - plyShootPos.x) * direction.x +
                       (entPos.y - plyShootPos.y) * direction.y +
                       (entPos.z - plyShootPos.z) * direction.z
     return (product < 0)
 end
 
-local plyShootPos, ang, pos, camangle, showFront -- Less variables being created each frame
-hook.Add( "PostDrawTranslucentRenderables", "SammyServers3D2DTextScreens", function()
+-- Draws the 3D2D text with the given positions, angles and data(text/font/col)
+local function Draw3D2D(ang, pos, camangle, data)
+	cam.Start3D2D(pos, camangle, .25)
+		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 
+		-- Loop through each line
+		for i=1, data[LEN] do
+			-- Font
+			surface.SetFont(data[i][FONT])
+			-- Posistion
+			surface.SetTextPos(data[i][POSX], data[i][POSY])
+			-- Colour
+			surface.SetTextColor(data[i][COL])
+			-- Text
+			surface.DrawText(data[i][TEXT])
+		end
+
+		render.PopFilterMin()
+	cam.End3D2D()
+end
+
+local plyShootPos, ang, pos, camangle, showFront, data -- Less variables being created each frame
+function ENT:Draw()
 	-- Cache the shoot pos for this frame
 	plyShootPos = LocalPlayer():GetShootPos()
 
-	for k, self in ipairs(toDraw) do
-		if IsValid(self) and screenInfo[self] != nil then
-			ang = self:GetAngles()
-			pos = self:GetPos() + ang:Up()
-			camangle = Angle(ang.p, ang.y, ang.r)
+	if screenInfo[self] != nil and self:GetPos():DistToSqr(plyShootPos) < render_range then
+		ang = self:GetAngles()
+		pos = self:GetPos() + ang:Up()
+		camangle = Angle(ang.p, ang.y, ang.r)
+		data = screenInfo[self]
 
+		-- Should we draw both screens? (Third person/calview drawing fix)
+		if shouldDrawBoth then
+			Draw3D2D(ang, pos, camangle, data)
+			camangle:RotateAroundAxis(camangle:Right(), 180)
+			Draw3D2D(ang, pos, camangle, data)
+		else
 			-- Is the front of the screen facing us or the back?
-			showFront = isInFront(pos, plyShootPos, ang:Up())
+			showFront = IsInFront(pos, plyShootPos, ang:Up())
 
 			-- Draw the front of the screen
-			if showFront then
-				cam.Start3D2D(pos, camangle, .25)
-					render.PushFilterMin(TEXFILTER.ANISOTROPIC)
-
-					for i=1, screenInfo[self].tableSize do
-						draw.DrawText(screenInfo[self][i].text, screenInfo[self][i].font, 0, screenInfo[self][i].pos, screenInfo[self][i].color, TEXT_ALIGN_CENTER)
-					end
-
-					render.PopFilterMin()
-				cam.End3D2D()
+			if showFront then 
+				Draw3D2D(ang, pos, camangle, data)
 			else
 			-- Draw the back of the screen
 				camangle:RotateAroundAxis(camangle:Right(), 180)
-				cam.Start3D2D(pos, camangle, .25)
-					render.PushFilterMin(TEXFILTER.ANISOTROPIC)
-
-					for i=1, screenInfo[self].tableSize do
-						draw.DrawText(screenInfo[self][i].text, screenInfo[self][i].font, 0, screenInfo[self][i].pos, screenInfo[self][i].color, TEXT_ALIGN_CENTER)
-					end
-
-					render.PopFilterMin()
-				cam.End3D2D()
+				Draw3D2D(ang, pos, camangle, data)
 			end
 		end
 	end
-end)
+end
 
-local function AddDrawingInfo(ent, t)
-	local t2 = {}
-	local curheight = 0
-	local totheight = 0
-	local font
+local function AddDrawingInfo(ent, rawData)
+	local data = {}
+	local textSize = {}
 
-	for i=1, #t do
-		t2[i] = {}
+	local totalHeight = 0
+	local maxWidth = 0
+	local currentHeight = 0
+
+	for i=1, #rawData do
+		-- Setup tables
+		data[i] = {}
+		textSize[i] = {}
 		-- Text
-		t2[i].text = t[i].text
-		-- Colour
-		t2[i].color = t[i].color
+		data[i][TEXT] = rawData[i].text
 		-- Font
-		t2[i].font = (ValidFont(t[i].font) or textscreenFonts[1]) .. t[i].size
-		-- Textsize
-		surface.SetFont(t2[i].font)
-		local TextWidth, TextHeight = surface.GetTextSize(t2[i].text)
-		-- Pos
-		totheight = totheight + TextHeight
-		t2[i].height = TextHeight
+		data[i][FONT] = (ValidFont(rawData[i].font) or textscreenFonts[1]) .. rawData[i].size
+		-- Text size
+		surface.SetFont(data[i][FONT])
+		textSize[i][1], textSize[i][2] = surface.GetTextSize(data[i][TEXT])
+		-- Workout max width for render bounds
+		maxWidth = maxWidth > textSize[i][1] and maxWidth or textSize[i][1]
+		-- Position
+		totalHeight = totalHeight + textSize[i][2]
+		-- Colour
+		data[i][COL] = Color(rawData[i].color.r, rawData[i].color.g, rawData[i].color.g, 255)
 	end
 
-	for i=1, #t do
-		t2[i].pos = -(totheight / 2) + curheight
-		curheight = curheight + t2[i].height
+	-- Sort out heights
+	for i=1, #rawData do
+		-- The x position at which to draw the text relative to the text screen entity
+		data[i][POSX] = math.ceil(-textSize[i][1] / 2)
+		-- The y position at which to draw the text relative to the text screen entity
+		data[i][POSY] = math.ceil(-(totalHeight / 2) + currentHeight)
+		-- Highest line to lowest, so that everything is central
+		currentHeight = currentHeight + textSize[i][2]
 	end
 
-	t2.tableSize = #t
+	-- Cache the number of lines/length
+	data[LEN] = #data
+	-- Add the new data to our text screen list
+	screenInfo[ent] = data
 
-	screenInfo[ent] = t2
+	-- Calculate the render bounds
+	local x = maxWidth / widthBoundsDivider
+	local y = currentHeight / heightBoundsDivider + 13 -- Text is above the centre
+
+	-- Setup the render bounds
+	ent:SetRenderBounds(Vector(-x, -y, -1.75), Vector(x, y, 1.75))
 end
 
 net.Receive("textscreens_update", function(len)
@@ -153,12 +166,6 @@ net.Receive("textscreens_update", function(len)
 		ent.lines = t -- Incase an addon or something wants to read the information.
 
 		AddDrawingInfo(ent, t)
-
-		-- Add to table to remove the delay from the timer
-		if ent:GetPos():DistToSqr(LocalPlayer():GetPos()) < render_range then
-			table.insert(toDraw, ent)
-		end
-
 	end
 end)
 
