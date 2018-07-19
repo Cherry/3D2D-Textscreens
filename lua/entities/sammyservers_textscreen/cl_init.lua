@@ -130,7 +130,7 @@ local function AddDrawingInfo(ent, rawData)
 		-- Position
 		totalHeight = totalHeight + textSize[i][2]
 		-- Colour
-		data[i][COL] = Color(rawData[i].color.r, rawData[i].color.g, rawData[i].color.g, 255)
+		data[i][COL] = Color(rawData[i].color.r, rawData[i].color.g, rawData[i].color.b, 255)
 	end
 
 	-- Sort out heights
