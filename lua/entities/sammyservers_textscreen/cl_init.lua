@@ -75,7 +75,7 @@ local function Draw3D2D(ang, pos, camangle, data)
 end
 
 local plyShootPos, ang, pos, camangle, showFront, data -- Less variables being created each frame
-function ENT:Draw()
+function ENT:DrawTranslucent()
 	-- Cache the shoot pos for this frame
 	plyShootPos = LocalPlayer():GetShootPos()
 
