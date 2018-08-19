@@ -5,7 +5,7 @@ if SERVER then
 	CreateConVar("sbox_maxtextscreens", "100", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 	CreateConVar("ss_call_to_home", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
-	local version = "1.6.0"
+	local version = "1.6.1"
 
 	local function GetOS()
 		if system.IsLinux() then return "linux" end
@@ -14,12 +14,11 @@ if SERVER then
 		return "unknown"
 	end
 
-	-- You can opt out of this call-to-home if you'd like, I just like stats.
+	-- Set ss_call_to_home to 1 to opt-in to anonymous stat tracking
 	-- These won't be used for anything other than putting a smile on my face :)
-	-- Set ss_call_to_home to 0 to opt out
 	hook.Add("Initialize", "CallToHomeSS", function()
 		timer.Simple(15, function()
-			if GetConVar("ss_call_to_home"):GetInt() == 0 then return end
+			if GetConVar("ss_call_to_home"):GetInt() ~= 1 then return end
 
 			http.Post("https://jross.me/textscreens/analytics.php", {
 				["operating_system"] = GetOS(),
