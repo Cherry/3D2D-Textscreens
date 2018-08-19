@@ -3,9 +3,9 @@ if SERVER then
 	AddCSLuaFile("textscreens_config.lua")
 	include("textscreens_config.lua")
 	CreateConVar("sbox_maxtextscreens", "100", {FCVAR_NOTIFY, FCVAR_REPLICATED})
-	CreateConVar("ss_call_to_home", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
+	CreateConVar("ss_call_to_home", "0", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
-	local version = "1.6.1"
+	local version = "1.6.2"
 
 	local function GetOS()
 		if system.IsLinux() then return "linux" end
