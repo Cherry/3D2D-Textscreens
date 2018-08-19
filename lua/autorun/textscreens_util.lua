@@ -3,9 +3,9 @@ if SERVER then
 	AddCSLuaFile("textscreens_config.lua")
 	include("textscreens_config.lua")
 	CreateConVar("sbox_maxtextscreens", "100", {FCVAR_NOTIFY, FCVAR_REPLICATED})
-	CreateConVar("ss_call_to_home", "0", {FCVAR_NOTIFY, FCVAR_REPLICATED})
+	CreateConVar("ss_call_to_home", 0, {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
-	local version = "1.6.2"
+	local version = "1.7.0"
 
 	local function GetOS()
 		if system.IsLinux() then return "linux" end
@@ -14,20 +14,32 @@ if SERVER then
 		return "unknown"
 	end
 
+	local submitted = false
+	local function submitAnalytics()
+		if GetConVar("ss_call_to_home"):GetInt() ~= 1 or submitted then return end
+
+		submitted = true
+		http.Post("https://jross.me/textscreens/analytics.php", {
+			["operating_system"] = GetOS(),
+			["server_dedicated"] = game.IsDedicated() and "true" or "false",
+			["server_name"] = GetHostName(),
+			["server_ip"] = util.CRC(game.GetIPAddress()),
+			["version"] = version
+		})
+	end
+
 	-- Set ss_call_to_home to 1 to opt-in to anonymous stat tracking
 	-- These won't be used for anything other than putting a smile on my face :)
 	hook.Add("Initialize", "CallToHomeSS", function()
 		timer.Simple(15, function()
-			if GetConVar("ss_call_to_home"):GetInt() ~= 1 then return end
-
-			http.Post("https://jross.me/textscreens/analytics.php", {
-				["operating_system"] = GetOS(),
-				["server_dedicated"] = game.IsDedicated() and "true" or "false",
-				["server_name"] = GetHostName(),
-				["server_ip"] = util.CRC(game.GetIPAddress()),
-				["version"] = version
-			})
+			submitAnalytics()
 		end)
+	end)
+
+	cvars.AddChangeCallback("ss_call_to_home", function(convar_name, value_old, value_new)
+		if(value_new == "1") then
+			submitAnalytics()
+		end
 	end)
 
 	local function StringRandom(int)

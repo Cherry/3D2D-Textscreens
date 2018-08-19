@@ -149,10 +149,22 @@ local function MakePresetControl(panel, mode, folder)
 end
 
 function TOOL.BuildCPanel(CPanel)
+	local logo = vgui.Create("DImage", CPanel)
+	logo:SetSize(267, 134)
+	logo:SetImage("textscreens/logo.png")
+	CPanel:AddItem(logo)
+
 	CPanel:AddControl("Header", {
 		Text = "#tool.textscreen.name",
 		Description = "#tool.textscreen.desc"
 	})
+
+	local analytics = vgui.Create("DCheckBoxLabel", CPanel)
+	analytics:SetText("Anonymous Analytics")
+	analytics:SetTextColor(Color(0,0,0,255))
+	analytics:SetConVar("ss_call_to_home")
+	analytics:SetTooltip("Enabling this will submit anonymous analytics to the author of this addon, including your Operating System, version of the addon, and anonymised IP address.")
+	CPanel:AddItem(analytics)
 
 	local function TrimFontName(fontnum)
 		return string.Left(textscreenFonts[fontnum], 8) == "Screens_" and string.TrimLeft(textscreenFonts[fontnum], "Screens_") or textscreenFonts[fontnum]
