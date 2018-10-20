@@ -55,37 +55,41 @@ if SERVER then
 
 	local textscreens = {}
 
-	hook.Add("InitPostEntity", "loadTextScreens", function()
-		timer.Simple(10, function()
-			print("Spawning textscreens...")
-			textscreens = file.Read("sammyservers_textscreens.txt", "DATA")
+	local function SpawnPermaTextscreens()
+		print("Spawning textscreens...")
+		textscreens = file.Read("sammyservers_textscreens.txt", "DATA")
 
-			if not textscreens then textscreens = {} return	end
+		if not textscreens then textscreens = {} return	end
 
-			textscreens = util.JSONToTable(textscreens)
-			local count = 0
+		textscreens = util.JSONToTable(textscreens)
+		local count = 0
 
-			for k, v in pairs(textscreens) do
-				if v.MapName ~= game.GetMap() then continue end
-				local textScreen = ents.Create("sammyservers_textscreen")
-				textScreen:SetPos(Vector(v.posx, v.posy, v.posz))
-				textScreen:SetAngles(Angle(v.angp, v.angy, v.angr))
-				textScreen.uniqueName = v.uniqueName
-				textScreen:Spawn()
-				textScreen:Activate()
-				textScreen:SetMoveType(MOVETYPE_NONE)
+		for k, v in pairs(textscreens) do
+			if v.MapName ~= game.GetMap() then continue end
+			local textScreen = ents.Create("sammyservers_textscreen")
+			textScreen:SetPos(Vector(v.posx, v.posy, v.posz))
+			textScreen:SetAngles(Angle(v.angp, v.angy, v.angr))
+			textScreen.uniqueName = v.uniqueName
+			textScreen:Spawn()
+			textScreen:Activate()
+			textScreen:SetMoveType(MOVETYPE_NONE)
 
-				for k, v in pairs(v.lines or {}) do
-					textScreen:SetLine(k, v.text, Color(v.color.r, v.color.g, v.color.b, v.color.a), v.size, v.font)
-				end
-
-				textScreen:SetIsPersisted(true)
-				count = count + 1
+			for k, v in pairs(v.lines or {}) do
+				textScreen:SetLine(k, v.text, Color(v.color.r, v.color.g, v.color.b, v.color.a), v.size, v.font)
 			end
 
-			print("Spawned " .. count .. " textscreens for map " .. game.GetMap())
-		end)
+			textScreen:SetIsPersisted(true)
+			count = count + 1
+		end
+
+		print("Spawned " .. count .. " textscreens for map " .. game.GetMap())
+	end
+
+	hook.Add("InitPostEntity", "loadTextScreens", function()
+		timer.Simple(10, SpawnPermaTextscreens)
 	end)
+
+	hook.Add("PostCleanupMap", "loadTextScreens", SpawnPermaTextscreens)
 
 	concommand.Add("SS_TextScreen", function(ply, cmd, args)
 		if not ply:IsSuperAdmin() or not args or not args[1] or not args[2] or not (args[1] == "delete" or args[1] == "add") then
