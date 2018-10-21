@@ -58,14 +58,20 @@ if SERVER then
 	local function SpawnPermaTextscreens()
 		print("Spawning textscreens...")
 		textscreens = file.Read("sammyservers_textscreens.txt", "DATA")
-
 		if not textscreens then textscreens = {} return	end
-
 		textscreens = util.JSONToTable(textscreens)
-		local count = 0
 
+		local existingTextscreens = {}
+		for k,v in pairs(ents.FindByClass("sammyservers_textscreen")) do
+			if not v.uniqueName then continue end
+			existingTextscreens[v.uniqueName] = true
+		end
+
+		local count = 0
 		for k, v in pairs(textscreens) do
 			if v.MapName ~= game.GetMap() then continue end
+			if existingTextscreens[v.uniqueName] then continue end
+
 			local textScreen = ents.Create("sammyservers_textscreen")
 			textScreen:SetPos(Vector(v.posx, v.posy, v.posz))
 			textScreen:SetAngles(Angle(v.angp, v.angy, v.angr))
