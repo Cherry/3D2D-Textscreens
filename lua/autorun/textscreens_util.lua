@@ -5,7 +5,7 @@ if SERVER then
 	CreateConVar("sbox_maxtextscreens", "100", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 	CreateConVar("ss_call_to_home", 0, {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
-	local version = "1.8.0"
+	local version = "1.8.1"
 
 	local function GetOS()
 		if system.IsLinux() then return "linux" end
@@ -102,7 +102,6 @@ if SERVER then
 			ply:ChatPrint("not authorised, or bad arguments")
 			return
 		end
-
 		local ent = Entity(args[2])
 		if not IsValid(ent) or ent:GetClass() ~= "sammyservers_textscreen" then return false end
 

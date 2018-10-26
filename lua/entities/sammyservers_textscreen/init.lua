@@ -48,6 +48,7 @@ util.AddNetworkString("textscreens_update")
 util.AddNetworkString("textscreens_download")
 
 function ENT:SetLine(line, text, color, size, font)
+	if not text then return end
 	if string.sub(text, 1, 1) == "#" then
 		text = string.sub(text, 2)
 	end
