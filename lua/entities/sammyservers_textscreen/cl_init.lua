@@ -117,7 +117,7 @@ local function AddDrawingInfo(ent, rawData)
 
 	for i=1, #rawData do
 		-- Setup tables
-		if not rawData[i] then continue end
+		if not rawData[i] or not rawData[i].text then continue end
 		data[i] = {}
 		textSize[i] = {}
 		-- Text
