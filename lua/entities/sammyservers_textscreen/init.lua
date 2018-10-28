@@ -11,8 +11,13 @@ function ENT:Initialize()
 	self:SetMaterial("models/effects/vol_light001")
 	self:SetSolid(SOLID_VPHYSICS)
 	self:SetCollisionGroup(COLLISION_GROUP_WORLD)
+	self:PhysicsInit(SOLID_VPHYSICS)
+	self:SetMoveType(MOVETYPE_VPHYSICS)
+	local phys = self:GetPhysicsObject()
+	if IsValid(phys) then
+		phys:EnableMotion(false)
+	end
 	self.heldby = 0
-	self:SetMoveType(MOVETYPE_NONE)
 end
 
 function ENT:PhysicsUpdate(phys)
@@ -31,6 +36,10 @@ hook.Add("PhysgunPickup", "textScreensPreventTravelPickup", textScreenPickup)
 local function textScreenDrop(ply, ent)
 	if IsValid(ent) and ent:GetClass() == "sammyservers_textscreen" then
 		ent.heldby = ent.heldby - 1
+		local phys = ent:GetPhysicsObject()
+		if IsValid(phys) then
+			ent:PhysicsUpdate(phys)
+		end
 	end
 end
 hook.Add("PhysgunDrop", "textScreensPreventTravelDrop", textScreenDrop)

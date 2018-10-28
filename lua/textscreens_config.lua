@@ -34,14 +34,14 @@ addFont("Coolvetica", {
 
 -- Trebuchet
 addFont("Screens_Trebuchet outlined", {
-	font = "Trebuchet18",
+	font = "Trebuchet MS",
 	weight = 400,
 	antialias = false,
 	outline = true
 })
 
 addFont("Screens_Trebuchet", {
-	font = "Trebuchet18",
+	font = "Trebuchet MS",
 	weight = 400,
 	antialias = false,
 	outline = false
@@ -93,31 +93,15 @@ addFont("Screens_Helvetica", {
 })
 
 -- akbar
-addFont("Screens_akbar outlined", {
+addFont("Screens_Akbar outlined", {
 	font = "akbar",
 	weight = 400,
 	antialias = false,
 	outline = true
 })
 
-addFont("Screens_akbar", {
+addFont("Screens_Akbar", {
 	font = "akbar",
-	weight = 400,
-	antialias = false,
-	outline = false
-})
-
-
--- boogaloo
-addFont("Screens_boogaloo outlined", {
-	font = "boogaloo",
-	weight = 400,
-	antialias = false,
-	outline = true
-})
-
-addFont("Screens_boogaloo", {
-	font = "boogaloo",
 	weight = 400,
 	antialias = false,
 	outline = false

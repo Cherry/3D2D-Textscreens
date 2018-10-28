@@ -5,7 +5,7 @@ if SERVER then
 	CreateConVar("sbox_maxtextscreens", "100", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 	CreateConVar("ss_call_to_home", 0, {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
-	local version = "1.8.2"
+	local version = "1.9.0"
 
 	local function GetOS()
 		if system.IsLinux() then return "linux" end
