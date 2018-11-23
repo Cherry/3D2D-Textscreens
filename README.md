@@ -1,7 +1,7 @@
-[![3D2D Textscreens](https://up.jross.me/textscreens/logo-dark.png)](http://steamcommunity.com/sharedfiles/filedetails/?id=109643223)
+[![3D2D Textscreens](https://up.jross.me/textscreens/logo-dark.png)](https://steamcommunity.com/sharedfiles/filedetails/?id=109643223)
 
 [![Powered by Nodecraft](https://up.jross.me/textscreens/nodecraft-logo-dark.png)](https://nodecraft.com/r/textscreens)
-##### This addon can be installed via the [Steam Workshop for Garry's Mod](http://steamcommunity.com/sharedfiles/filedetails/?id=109643223) - I do not recommend manually installing this addon via git.
+##### This addon can be installed via the [Steam Workshop for Garry's Mod](https://steamcommunity.com/sharedfiles/filedetails/?id=109643223) - I do not recommend manually installing this addon via git.
 
 ###### Features: 
 * Create 3D2D text anywhere in the world 
@@ -23,6 +23,6 @@
 * Set `ss_call_to_home 1` on your server to provide anonymous analytics including your operating system, version of the addon, and rough, anonymised geo-location. This is entirely optional and used solely to put a smile on my face.
 * To install this onto your server, follow the instructions [listed here](https://wiki.garrysmod.com/page/Workshop_for_Dedicated_Servers).
 
-Further information can be found on the [Steam Workshop for Garry's Mod](http://steamcommunity.com/sharedfiles/filedetails/?id=109643223).
+Further information can be found on the [Steam Workshop for Garry's Mod](https://steamcommunity.com/sharedfiles/filedetails/?id=109643223).
 
 All pull requests welcomed.
