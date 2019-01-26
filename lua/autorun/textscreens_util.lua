@@ -1,3 +1,11 @@
+local function checkAdmin(ply)
+	local canAdmin = hook.Run("TextscreensCanAdmin", ply) -- run custom hook function to check admin
+	if canAdmin == nil then -- if hook hasn't returned anything, default to super admin check
+		canAdmin = ply:IsSuperAdmin()
+	end
+	return canAdmin
+end
+
 if SERVER then
 	AddCSLuaFile()
 	AddCSLuaFile("textscreens_config.lua")
@@ -5,7 +13,7 @@ if SERVER then
 	CreateConVar("sbox_maxtextscreens", "100", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 	CreateConVar("ss_call_to_home", 0, {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
-	local version = "1.9.0"
+	local version = "1.10.0"
 
 	local function GetOS()
 		if system.IsLinux() then return "linux" end
@@ -98,7 +106,7 @@ if SERVER then
 	hook.Add("PostCleanupMap", "loadTextScreens", SpawnPermaTextscreens)
 
 	concommand.Add("SS_TextScreen", function(ply, cmd, args)
-		if not ply:IsSuperAdmin() or not args or not args[1] or not args[2] or not (args[1] == "delete" or args[1] == "add") then
+		if not checkAdmin(ply) or not args or not args[1] or not args[2] or not (args[1] == "delete" or args[1] == "add") then
 			ply:ChatPrint("not authorised, or bad arguments")
 			return
 		end
@@ -150,7 +158,7 @@ if CLIENT then
 			if not IsValid(ent) or ent:GetClass() ~= "sammyservers_textscreen" then return false end
 			if ent:GetIsPersisted() then return false end
 
-			return ply:IsAdmin()
+			return checkAdmin(ply)
 		end,
 		Action = function(self, ent)
 			if not IsValid(ent) then return false end
@@ -167,7 +175,7 @@ if CLIENT then
 			if not IsValid(ent) or ent:GetClass() ~= "sammyservers_textscreen" then return false end
 			if not ent:GetIsPersisted() then return false end
 
-			return ply:IsAdmin()
+			return checkAdmin(ply)
 		end,
 		Action = function(self, ent)
 			if not IsValid(ent) then return end

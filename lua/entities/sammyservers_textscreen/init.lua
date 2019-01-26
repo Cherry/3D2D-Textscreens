@@ -1,5 +1,6 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
+resource.AddFile("materials/textscreens/logo.png")
 
 include("shared.lua")
 
