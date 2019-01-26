@@ -1,8 +1,14 @@
 {
-	"title"		:	"3D2D Textscreens",
-	"type"		:	"tool",
-	"tags"		:	[ "fun", "roleplay" ],
-	"ignore"	:
-	[
+	"title": "3D2D Textscreens",
+	"type":	"tool",
+	"tags":	[
+		"fun",
+		"roleplay"
+	],
+	"ignore": [
+		".glualint.json",
+		"LICENSE",
+		"*.exe",
+		"*.md"
 	]
 }

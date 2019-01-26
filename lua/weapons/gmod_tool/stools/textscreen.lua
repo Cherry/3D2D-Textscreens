@@ -66,16 +66,16 @@ function TOOL:LeftClick(tr)
 	for i = 1, 5 do
 		textScreen:SetLine(
 			i, -- Line
-			self:GetClientInfo("text"..i) or "", -- text
+			self:GetClientInfo("text" .. i) or "", -- text
 			Color( -- Color
-				tonumber(self:GetClientInfo("r"..i)) or 255,
-				tonumber(self:GetClientInfo("g"..i)) or 255,
-				tonumber(self:GetClientInfo("b"..i)) or 255,
-				tonumber(self:GetClientInfo("a"..i)) or 255
+				tonumber(self:GetClientInfo("r" .. i)) or 255,
+				tonumber(self:GetClientInfo("g" .. i)) or 255,
+				tonumber(self:GetClientInfo("b" .. i)) or 255,
+				tonumber(self:GetClientInfo("a" .. i)) or 255
 			),
-			tonumber(self:GetClientInfo("size"..i)) or 20,
+			tonumber(self:GetClientInfo("size" .. i)) or 20,
 			-- font
-			tonumber(self:GetClientInfo("font"..i)) or 1
+			tonumber(self:GetClientInfo("font" .. i)) or 1
 		)
 	end
 
@@ -91,16 +91,16 @@ function TOOL:RightClick(tr)
 		for i = 1, 5 do
 			TraceEnt:SetLine(
 				i, -- Line
-				tostring(self:GetClientInfo("text"..i)), -- text
+				tostring(self:GetClientInfo("text" .. i)), -- text
 				Color( -- Color
-					tonumber(self:GetClientInfo("r"..i)) or 255, 
-					tonumber(self:GetClientInfo("g"..i)) or 255, 
-					tonumber(self:GetClientInfo("b"..i)) or 255, 
-					tonumber(self:GetClientInfo("a"..i)) or 255
+					tonumber(self:GetClientInfo("r" .. i)) or 255,
+					tonumber(self:GetClientInfo("g" .. i)) or 255,
+					tonumber(self:GetClientInfo("b" .. i)) or 255,
+					tonumber(self:GetClientInfo("a" .. i)) or 255
 				),
-				tonumber(self:GetClientInfo("size"..i)) or 20,
+				tonumber(self:GetClientInfo("size" .. i)) or 20,
 				-- font
-				tonumber(self:GetClientInfo("font"..i)) or 1
+				tonumber(self:GetClientInfo("font" .. i)) or 1
 			)
 		end
 
@@ -130,22 +130,22 @@ end
 
 local function MakePresetControl(panel, mode, folder)
 	if not mode or not panel then return end
-	local TOOL = LocalPlayer():GetTool(mode)
-	if not TOOL then return end
+	local tool = LocalPlayer():GetTool(mode)
+	if not tool then return end
 	local ctrl = vgui.Create( "ControlPresets", panel )
 	ctrl:SetPreset(folder or mode)
-	if TOOL.ClientConVar then
+	if tool.ClientConVar then
 		local options = {}
-		for k, v in pairs(TOOL.ClientConVar) do
+		for k, v in pairs(tool.ClientConVar) do
 			if k ~= "id" then
-				k = mode.."_"..k
+				k = mode .. "_" .. k
 				options[k] = v
 				ctrl:AddConVar(k)
 			end
 		end
 		ctrl:AddOption("#Default", options)
 	end
-	panel:AddPanel( ctrl )
+	panel:AddPanel(ctrl)
 end
 
 function TOOL.BuildCPanel(CPanel)
@@ -171,11 +171,11 @@ function TOOL.BuildCPanel(CPanel)
 	end
 
 	local changefont
-	local fontnum = textscreenFonts[GetConVar("textscreen_font1"):GetInt()] != nil and GetConVar("textscreen_font1"):GetInt() or 1
+	local fontnum = textscreenFonts[GetConVar("textscreen_font1"):GetInt()] ~= nil and GetConVar("textscreen_font1"):GetInt() or 1
 	local fontsize = {}
 
 	cvars.AddChangeCallback("textscreen_font1", function(convar_name, value_old, value_new)
-		fontnum = textscreenFonts[tonumber(value_new)] != nil and tonumber(value_new) or 1
+		fontnum = textscreenFonts[tonumber(value_new)] ~= nil and tonumber(value_new) or 1
 		local font = TrimFontName(fontnum)
 		changefont:SetText("Change font (" .. font .. ")")
 	end)
@@ -183,7 +183,7 @@ function TOOL.BuildCPanel(CPanel)
 	local function ResetFont(lines, text)
 		if #lines >= 5 then
 			fontnum = 1
-			for i=1, 5 do
+			for i = 1, 5 do
 				RunConsoleCommand("textscreen_font" .. i, 1)
 			end
 		end
@@ -307,7 +307,7 @@ function TOOL.BuildCPanel(CPanel)
 			local font = TrimFontName(i)
 			menu:AddOption(font, function()
 				fontnum = i
-				for o=1, 5 do
+				for o = 1, 5 do
 					RunConsoleCommand("textscreen_font" .. o, i)
 					labels[o]:SetFont(textscreenFonts[fontnum] .. fontsize[o])
 				end

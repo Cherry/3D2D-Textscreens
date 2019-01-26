@@ -24,7 +24,7 @@ hook.Add("Think", "ss_should_draw_both_sides", function()
 end)
 
 local function ValidFont(f)
-	if textscreenFonts[f] != nil then
+	if textscreenFonts[f] ~= nil then
 		return textscreenFonts[f]
 	elseif table.HasValue(textscreenFonts, f) then
 		return f
@@ -47,19 +47,19 @@ end
 
 local product
 local function IsInFront(entPos, plyShootPos, direction)
-    product = (entPos.x - plyShootPos.x) * direction.x +
-                      (entPos.y - plyShootPos.y) * direction.y +
-                      (entPos.z - plyShootPos.z) * direction.z
-    return (product < 0)
+	product = (entPos.x - plyShootPos.x) * direction.x +
+		(entPos.y - plyShootPos.y) * direction.y +
+		(entPos.z - plyShootPos.z) * direction.z
+	return product < 0
 end
 
 -- Draws the 3D2D text with the given positions, angles and data(text/font/col)
 local function Draw3D2D(ang, pos, camangle, data)
 	cam.Start3D2D(pos, camangle, .25)
-		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+		-render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 
 		-- Loop through each line
-		for i=1, data[LEN] do
+		for i = 1, data[LEN] do
 			if not data[i] or not data[i][TEXT] then continue end
 			-- Font
 			surface.SetFont(data[i][FONT])
@@ -80,7 +80,7 @@ function ENT:DrawTranslucent()
 	-- Cache the shoot pos for this frame
 	plyShootPos = LocalPlayer():GetShootPos()
 
-	if screenInfo[self] != nil and self:GetPos():DistToSqr(plyShootPos) < render_range then
+	if screenInfo[self] ~= nil and self:GetPos():DistToSqr(plyShootPos) < render_range then
 		ang = self:GetAngles()
 		pos = self:GetPos() + ang:Up()
 		camangle = Angle(ang.p, ang.y, ang.r)
@@ -108,48 +108,48 @@ function ENT:DrawTranslucent()
 end
 
 local function AddDrawingInfo(ent, rawData)
-	local data = {}
+	local drawData = {}
 	local textSize = {}
 
 	local totalHeight = 0
 	local maxWidth = 0
 	local currentHeight = 0
 
-	for i=1, #rawData do
+	for i = 1, #rawData do
 		-- Setup tables
 		if not rawData[i] or not rawData[i].text then continue end
-		data[i] = {}
+		drawData[i] = {}
 		textSize[i] = {}
 		-- Text
-		data[i][TEXT] = rawData[i].text
+		drawData[i][TEXT] = rawData[i].text
 		-- Font
-		data[i][FONT] = (ValidFont(rawData[i].font) or textscreenFonts[1]) .. rawData[i].size
+		drawData[i][FONT] = (ValidFont(rawData[i].font) or textscreenFonts[1]) .. rawData[i].size
 		-- Text size
-		surface.SetFont(data[i][FONT])
-		textSize[i][1], textSize[i][2] = surface.GetTextSize(data[i][TEXT])
+		surface.SetFont(drawData[i][FONT])
+		textSize[i][1], textSize[i][2] = surface.GetTextSize(drawData[i][TEXT])
 		-- Workout max width for render bounds
 		maxWidth = maxWidth > textSize[i][1] and maxWidth or textSize[i][1]
 		-- Position
 		totalHeight = totalHeight + textSize[i][2]
 		-- Colour
-		data[i][COL] = Color(rawData[i].color.r, rawData[i].color.g, rawData[i].color.b, 255)
+		drawData[i][COL] = Color(rawData[i].color.r, rawData[i].color.g, rawData[i].color.b, 255)
 	end
 
 	-- Sort out heights
-	for i=1, #rawData do
+	for i = 1, #rawData do
 		if not rawData[i] then continue end
 		-- The x position at which to draw the text relative to the text screen entity
-		data[i][POSX] = math.ceil(-textSize[i][1] / 2)
+		drawData[i][POSX] = math.ceil(-textSize[i][1] / 2)
 		-- The y position at which to draw the text relative to the text screen entity
-		data[i][POSY] = math.ceil(-(totalHeight / 2) + currentHeight)
+		drawData[i][POSY] = math.ceil(-(totalHeight / 2) + currentHeight)
 		-- Highest line to lowest, so that everything is central
 		currentHeight = currentHeight + textSize[i][2]
 	end
 
 	-- Cache the number of lines/length
-	data[LEN] = #data
+	drawData[LEN] = #drawData
 	-- Add the new data to our text screen list
-	screenInfo[ent] = data
+	screenInfo[ent] = drawData
 
 	-- Calculate the render bounds
 	local x = maxWidth / widthBoundsDivider
@@ -176,7 +176,7 @@ end)
 if IsValid(LocalPlayer()) then
 	local screens = ents.FindByClass("sammyservers_textscreen")
 	for k, v in ipairs(screens) do
-		if screenInfo[v] == nil and v.lines != nil then
+		if screenInfo[v] == nil and v.lines ~= nil then
 			AddDrawingInfo(v, v.lines)
 		end
 	end
