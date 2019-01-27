@@ -25,7 +25,7 @@
 
 
 ### Custom admin permissions:
-This addon supports custom permissions via the use of `TextscreensCanAdmin`. When this hook isn't present, or doesn't return anything, it default to an `IsSuperAdmin` check. If you want to override this behaviour for your own admin permissions, create a hook that exists both server *and* client side, similar to the following:
+This addon supports custom permissions via the use of a `TextscreensCanAdmin` hook. When this hook isn't present, or doesn't return anything, it defaults to an `IsSuperAdmin` check. If you want to override this behaviour for your own admin permissions, create a hook that exists both server *and* client side, similar to the following:
 ```lua
 hook.Add("TextscreensCanAdmin", "MyCustomAdminFunc", function(ply)
 	return ply:SteamID() == "STEAM_0:0:43716939"
