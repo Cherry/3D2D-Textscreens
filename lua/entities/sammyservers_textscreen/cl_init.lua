@@ -56,7 +56,7 @@ end
 -- Draws the 3D2D text with the given positions, angles and data(text/font/col)
 local function Draw3D2D(ang, pos, camangle, data)
 	cam.Start3D2D(pos, camangle, .25)
-		-render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 
 		-- Loop through each line
 		for i = 1, data[LEN] do
