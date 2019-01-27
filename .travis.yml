@@ -1,0 +1,8 @@
+language: minimal
+
+install:
+  - curl -o glualint.zip -L https://github.com/FPtje/GLuaFixer/releases/download/1.10.0/glualint-1.10.0-linux.zip
+  - unzip glualint.zip
+
+script:
+  - ./glualint lua

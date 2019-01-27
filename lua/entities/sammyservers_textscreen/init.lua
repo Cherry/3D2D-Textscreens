@@ -46,10 +46,9 @@ end
 hook.Add("PhysgunDrop", "textScreensPreventTravelDrop", textScreenDrop)
 
 local function textScreenCanTool(ply, trace, tool)
-	if IsValid(trace.Entity) and trace.Entity:GetClass() == "sammyservers_textscreen" then
-		if !(tool == "textscreen" or tool == "remover") then
-			return false
-		end
+	-- only allow textscreen and remover tool
+	if IsValid(trace.Entity) and trace.Entity:GetClass() == "sammyservers_textscreen" and tool ~= "textscreen" and tool ~= "remover" then
+		return false
 	end
 end
 hook.Add("CanTool", "textScreensPreventTools", textScreenCanTool)
@@ -68,7 +67,7 @@ function ENT:SetLine(line, text, color, size, font)
 
 	size = math.Clamp(size, 1, 100)
 
-	font = textscreenFonts[font] != nil and font or 1
+	font = textscreenFonts[font] ~= nil and font or 1
 
 	self.lines = self.lines or {}
 	self.lines[tonumber(line)] = {

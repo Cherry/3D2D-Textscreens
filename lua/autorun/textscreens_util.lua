@@ -45,7 +45,7 @@ if SERVER then
 	end)
 
 	cvars.AddChangeCallback("ss_call_to_home", function(convar_name, value_old, value_new)
-		if(value_new == "1") then
+		if value_new == "1" then
 			submitAnalytics()
 		end
 	end)
@@ -88,8 +88,8 @@ if SERVER then
 			textScreen:Activate()
 			textScreen:SetMoveType(MOVETYPE_NONE)
 
-			for k, v in pairs(v.lines or {}) do
-				textScreen:SetLine(k, v.text, Color(v.color.r, v.color.g, v.color.b, v.color.a), v.size, v.font)
+			for lineNum, lineData in pairs(v.lines or {}) do
+				textScreen:SetLine(lineNum, lineData.text, Color(lineData.color.r, lineData.color.g, lineData.color.b, lineData.color.a), lineData.size, lineData.font)
 			end
 
 			textScreen:SetIsPersisted(true)
