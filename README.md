@@ -1,6 +1,6 @@
-[![3D2D Textscreens](https://up.jross.me/textscreens/logo-dark.png)](https://steamcommunity.com/sharedfiles/filedetails/?id=109643223)
+[<img src="https://up.jross.me/textscreens/logo-dark-slim.svg" alt="3D2D Textscreens" width="300px">](https://steamcommunity.com/sharedfiles/filedetails/?id=109643223)
 
-[![Powered by Nodecraft](https://up.jross.me/textscreens/nodecraft-logo-dark.png)](https://nodecraft.com/r/textscreens)
+[<img src="https://up.jross.me/textscreens/nodecraft-logo-light.svg" alt="Powered by Nodecraft" width="300px">](https://nodecraft.com/r/textscreens)
 
 [![Build Status](https://img.shields.io/travis/Cherry/3D2D-Textscreens/master.svg?style=for-the-badge)](https://travis-ci.org/Cherry/3D2D-Textscreens)
 [![Steam Workshop Subscribers](https://img.shields.io/badge/dynamic/json.svg?label=steam&url=https://up.jross.me/steam-workshop-badge/109643223&query=$.subscriptions_formatted&logo=steam&style=for-the-badge&colorB=55b652)](https://steamcommunity.com/sharedfiles/filedetails/?id=109643223)
