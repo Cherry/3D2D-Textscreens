@@ -47,6 +47,15 @@ function TOOL:LeftClick(tr)
 	if (CLIENT) then return true end
 	local ply = self:GetOwner()
 	if not (self:GetWeapon():CheckLimit("textscreens")) then return false end
+	-- ensure at least 1 line of the textscreen has text before creating entity
+	local hasText = false
+	for i = 1, 5 do
+		local text = self:GetClientInfo("text" .. i) or ""
+		if text ~= "" then
+			hasText = true
+		end
+	end
+	if not hasText then return false end
 	local textScreen = ents.Create("sammyservers_textscreen")
 	textScreen:SetPos(tr.HitPos)
 	local angle = tr.HitNormal:Angle()
@@ -128,25 +137,7 @@ function TOOL:Reload(tr)
 	return true
 end
 
-local function MakePresetControl(panel, mode, folder)
-	if not mode or not panel then return end
-	local tool = LocalPlayer():GetTool(mode)
-	if not tool then return end
-	local ctrl = vgui.Create( "ControlPresets", panel )
-	ctrl:SetPreset(folder or mode)
-	if tool.ClientConVar then
-		local options = {}
-		for k, v in pairs(tool.ClientConVar) do
-			if k ~= "id" then
-				k = mode .. "_" .. k
-				options[k] = v
-				ctrl:AddConVar(k)
-			end
-		end
-		ctrl:AddOption("#Default", options)
-	end
-	panel:AddPanel(ctrl)
-end
+local ConVarsDefault = TOOL:BuildConVarList()
 
 function TOOL.BuildCPanel(CPanel)
 	local logo = vgui.Create("DImage", CPanel)
@@ -320,7 +311,14 @@ function TOOL.BuildCPanel(CPanel)
 
 	CPanel:AddItem(changefont)
 
-	MakePresetControl(CPanel, "textscreen")
+	CPanel:AddControl("ComboBox", {
+		MenuButton = 1,
+		Folder = "textscreen",
+		Options = {
+			["#preset.default"] = ConVarsDefault
+		},
+		CVars = table.GetKeys(ConVarsDefault)
+	})
 
 	for i = 1, 5 do
 		fontsize[i] = 20
