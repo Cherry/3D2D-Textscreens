@@ -10,10 +10,10 @@ if SERVER then
 	AddCSLuaFile()
 	AddCSLuaFile("textscreens_config.lua")
 	include("textscreens_config.lua")
-	CreateConVar("sbox_maxtextscreens", "100", {FCVAR_NOTIFY, FCVAR_REPLICATED})
+	CreateConVar("sbox_maxtextscreens", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 	CreateConVar("ss_call_to_home", 0, {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
-	local version = "1.11.0"
+	local version = "1.11.1"
 
 	local function GetOS()
 		if system.IsLinux() then return "linux" end
@@ -64,9 +64,13 @@ if SERVER then
 	local textscreens = {}
 
 	local function SpawnPermaTextscreens()
-		print("Spawning textscreens...")
+		print("[3D2D Textscreens] Spawning textscreens...")
 		textscreens = file.Read("sammyservers_textscreens.txt", "DATA")
-		if not textscreens then textscreens = {} return	end
+		if not textscreens then
+			textscreens = {}
+			print("[3D2D Textscreens] Spawned 0 textscreens for map " .. game.GetMap())
+			return
+		end
 		textscreens = util.JSONToTable(textscreens)
 
 		local existingTextscreens = {}
@@ -96,7 +100,7 @@ if SERVER then
 			count = count + 1
 		end
 
-		print("Spawned " .. count .. " textscreens for map " .. game.GetMap())
+		print("[3D2D Textscreens] Spawned " .. count .. " textscreens for map " .. game.GetMap())
 	end
 
 	hook.Add("InitPostEntity", "loadTextScreens", function()
@@ -131,7 +135,7 @@ if SERVER then
 			file.Write("sammyservers_textscreens.txt", util.TableToJSON(textscreens))
 			ent:SetIsPersisted(true)
 
-			return ply:ChatPrint("Textscreen made permament and saved.")
+			return ply:ChatPrint("Textscreen made permanent and saved.")
 		else
 			for k, v in pairs(textscreens) do
 				if v.uniqueName == ent.uniqueName then
