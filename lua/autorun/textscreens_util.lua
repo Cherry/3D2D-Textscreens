@@ -13,7 +13,7 @@ if SERVER then
 	CreateConVar("sbox_maxtextscreens", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 	CreateConVar("ss_call_to_home", 0, {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
-	local version = "1.11.1"
+	local version = "1.11.2"
 
 	local function GetOS()
 		if system.IsLinux() then return "linux" end
@@ -66,7 +66,7 @@ if SERVER then
 	local function SpawnPermaTextscreens()
 		print("[3D2D Textscreens] Spawning textscreens...")
 		textscreens = file.Read("sammyservers_textscreens.txt", "DATA")
-		if not textscreens then
+		if not textscreens or textscreens == "" then
 			textscreens = {}
 			print("[3D2D Textscreens] Spawned 0 textscreens for map " .. game.GetMap())
 			return
