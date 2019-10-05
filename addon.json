@@ -6,9 +6,9 @@
 		"roleplay"
 	],
 	"ignore": [
+		".github",
 		".gitignore",
 		".glualint.json",
-		".travis.yml",
 		"LICENSE",
 		"*.exe",
 		"*.md"
