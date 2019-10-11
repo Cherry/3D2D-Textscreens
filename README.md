@@ -37,6 +37,6 @@ end)
 
 ---
 
-Further information can be found on the [Steam Workshop for Garry's Mod](https://steamcommunity.com/sharedfiles/filedetails/?id=109643223).
+Further information can be found on the [Steam Workshop for Garry's Mod](https://steamcommunity.com/sharedfiles/filedetails/?id=109643223) or [on my website](https://jross.me/3d2d-textscreens/).
 
 All pull requests welcomed.
