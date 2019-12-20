@@ -47,7 +47,7 @@ hook.Add("PhysgunDrop", "textScreensPreventTravelDrop", textScreenDrop)
 
 local function textScreenCanTool(ply, trace, tool)
 	-- only allow textscreen and remover tool
-	if IsValid(trace.Entity) and trace.Entity:GetClass() == "sammyservers_textscreen" and tool ~= "textscreen" and tool ~= "remover" then
+	if IsValid(trace.Entity) and trace.Entity:GetClass() == "sammyservers_textscreen" and tool ~= "textscreen" and tool ~= "remover" and tool ~= "permaprops" then
 		return false
 	end
 end
