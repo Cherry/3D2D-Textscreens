@@ -32,7 +32,7 @@ local function textScreenPickup(ply, ent)
 		ent.heldby = ent.heldby + 1
 	end
 end
-hook.Add("PhysgunPickup", "textScreensPreventTravelPickup", textScreenPickup)
+hook.Add("PhysgunPickup", "3D2DTextScreensPreventTravelPickup", textScreenPickup)
 
 local function textScreenDrop(ply, ent)
 	if IsValid(ent) and ent:GetClass() == "sammyservers_textscreen" then
@@ -43,7 +43,7 @@ local function textScreenDrop(ply, ent)
 		end
 	end
 end
-hook.Add("PhysgunDrop", "textScreensPreventTravelDrop", textScreenDrop)
+hook.Add("PhysgunDrop", "3D2DTextScreensPreventTravelDrop", textScreenDrop)
 
 local function textScreenCanTool(ply, trace, tool)
 	-- only allow textscreen and remover tool
@@ -51,7 +51,7 @@ local function textScreenCanTool(ply, trace, tool)
 		return false
 	end
 end
-hook.Add("CanTool", "textScreensPreventTools", textScreenCanTool)
+hook.Add("CanTool", "3D2DTextScreensPreventTools", textScreenCanTool)
 
 util.AddNetworkString("textscreens_update")
 util.AddNetworkString("textscreens_download")
