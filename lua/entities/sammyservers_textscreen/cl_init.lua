@@ -24,13 +24,9 @@ hook.Add("Think", "ss_should_draw_both_sides", function()
 end)
 
 local function ValidFont(f)
-	if textscreenFonts[f] ~= nil then
-		return textscreenFonts[f]
-	elseif table.HasValue(textscreenFonts, f) then
-		return f
-	else
-		return false
-	end
+	local r = textscreenFonts[f] ~= nil and textscreenFonts[f] or table.HasValue(textscreenFonts, f) and f or false
+	
+	return r
 end
 
 cvars.AddChangeCallback("ss_render_range", function(convar_name, value_old, value_new)
