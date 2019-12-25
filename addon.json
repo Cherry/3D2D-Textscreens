@@ -6,7 +6,7 @@
 		"roleplay"
 	],
 	"ignore": [
-		".github",
+		".github/*",
 		".gitignore",
 		".glualint.json",
 		"LICENSE",
