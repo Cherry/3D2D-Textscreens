@@ -45,14 +45,6 @@ local function textScreenDrop(ply, ent)
 end
 hook.Add("PhysgunDrop", "3D2DTextScreensPreventTravelDrop", textScreenDrop)
 
-local function textScreenCanTool(ply, trace, tool)
-	-- only allow textscreen and remover tool
-	if IsValid(trace.Entity) and trace.Entity:GetClass() == "sammyservers_textscreen" and tool ~= "textscreen" and tool ~= "remover" and tool ~= "permaprops" then
-		return false
-	end
-end
-hook.Add("CanTool", "3D2DTextScreensPreventTools", textScreenCanTool)
-
 util.AddNetworkString("textscreens_update")
 util.AddNetworkString("textscreens_download")
 

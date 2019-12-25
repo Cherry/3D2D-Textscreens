@@ -4,11 +4,13 @@ on: [push, pull_request]
 
 jobs:
   lint:
-    runs-on: ubuntu-latest    
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
     - name: Download GLuaLint
-      run: curl -o glualint.zip -L https://github.com/FPtje/GLuaFixer/releases/download/1.11.2/glualint-1.11.2-linux.zip
+      run: curl -o glualint.zip -L https://github.com/FPtje/GLuaFixer/releases/download/$GLUALINT_VERSION/glualint-$GLUALINT_VERSION-linux.zip
+      env:
+        GLUALINT_VERSION: 1.12.0
     - name: Unzip GLuaLint
       run: unzip glualint.zip
     - name: Lint lua files

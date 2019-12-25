@@ -1,4 +1,9 @@
 local function checkAdmin(ply)
+	-- The server console always has access. `ply` is NULL in this case
+	local isConsole = ply == nil or ply == NULL
+	if isConsole then
+		return true
+	end
 	local canAdmin = hook.Run("TextscreensCanAdmin", ply) -- run custom hook function to check admin
 	if canAdmin == nil then -- if hook hasn't returned anything, default to super admin check
 		canAdmin = ply:IsSuperAdmin()
@@ -13,7 +18,7 @@ if SERVER then
 	CreateConVar("sbox_maxtextscreens", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 	CreateConVar("ss_call_to_home", 0, {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
-	local version = "1.12.1"
+	local version = "1.13.0"
 
 	local function GetOS()
 		if system.IsLinux() then return "linux" end
@@ -109,9 +114,18 @@ if SERVER then
 
 	hook.Add("PostCleanupMap", "loadTextScreens", SpawnPermaTextscreens)
 
+	-- If a player, use ChatPrint method, else print directly to server console
+	local function printMessage(ply, msg)
+		local isConsole = ply == nil or ply == NULL
+		if isConsole then
+			print(msg)
+		else
+			ply:ChatPrint(msg)
+		end
+	end
 	concommand.Add("SS_TextScreen", function(ply, cmd, args)
 		if not checkAdmin(ply) or not args or not args[1] or not args[2] or not (args[1] == "delete" or args[1] == "add") then
-			ply:ChatPrint("not authorised, or bad arguments")
+			printMessage(ply, "not authorised, or bad arguments")
 			return
 		end
 		local ent = Entity(args[2])
@@ -127,7 +141,7 @@ if SERVER then
 			toAdd.angp = ang.p
 			toAdd.angy = ang.y
 			toAdd.angr = ang.r
-			-- So we can reference it easilly later because EntIndexes are so unreliable
+			-- So we can reference it easily later because EntIndexes are so unreliable
 			toAdd.uniqueName = StringRandom(10)
 			toAdd.MapName = game.GetMap()
 			toAdd.lines = ent.lines
@@ -135,7 +149,7 @@ if SERVER then
 			file.Write("sammyservers_textscreens.txt", util.TableToJSON(textscreens))
 			ent:SetIsPersisted(true)
 
-			return ply:ChatPrint("Textscreen made permanent and saved.")
+			return printMessage(ply, "Textscreen made permanent and saved.")
 		else
 			for k, v in pairs(textscreens) do
 				if v.uniqueName == ent.uniqueName then
@@ -146,7 +160,7 @@ if SERVER then
 			ent:Remove()
 			file.Write("sammyservers_textscreens.txt", util.TableToJSON(textscreens))
 
-			return ply:ChatPrint("Textscreen removed and is no longer permanent.")
+			return printMessage(ply, "Textscreen removed and is no longer permanent.")
 		end
 	end)
 end
