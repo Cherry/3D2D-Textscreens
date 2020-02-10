@@ -6,7 +6,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Download GLuaLint
       run: curl -o glualint.zip -L https://github.com/FPtje/GLuaFixer/releases/download/$GLUALINT_VERSION/glualint-$GLUALINT_VERSION-linux.zip
       env:
