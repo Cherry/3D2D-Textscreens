@@ -127,7 +127,7 @@ local function AddDrawingInfo(ent, rawData)
 		-- Text
 		drawData[i][TEXT] = rawData[i].text
 		-- Font
-		drawData[i][FONT] = "TEXTSCREEN_"..(ValidFont(rawData[i].font) or textscreenFonts[1]) 
+		drawData[i][FONT] = (ValidFont(rawData[i].font) or textscreenFonts[1]) 
 		-- Text size
 		surface.SetFont(drawData[i][FONT])
 		textSize[i][1], textSize[i][2] = surface.GetTextSize(drawData[i][TEXT])
