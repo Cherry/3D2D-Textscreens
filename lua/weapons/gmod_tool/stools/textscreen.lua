@@ -182,7 +182,7 @@ function TOOL.BuildCPanel(CPanel)
 				RunConsoleCommand("textscreen_text" .. i, "")
 				labels[i]:SetText("")
 			end
-			labels[i]:SetFont(textscreenFonts[fontnum].."_MENU")
+			labels[i]:SetFont(textscreenFonts[fontnum] .. "_MENU")
 		end
 	end
 
@@ -206,7 +206,7 @@ function TOOL.BuildCPanel(CPanel)
 			for i = 1, 5 do
 				RunConsoleCommand("textscreen_size" .. i, 20)
 				sliders[i]:SetValue(20)
-				labels[i]:SetFont(textscreenFonts[fontnum].."_MENU")
+				labels[i]:SetFont(textscreenFonts[fontnum] .. "_MENU")
 			end
 		end)
 
@@ -295,7 +295,7 @@ function TOOL.BuildCPanel(CPanel)
 				fontnum = i
 				for o = 1, 5 do
 					RunConsoleCommand("textscreen_font" .. o, i)
-					labels[o]:SetFont(textscreenFonts[fontnum].."_MENU")
+					labels[o]:SetFont(textscreenFonts[fontnum] .. "_MENU")
 				end
 				changefont:SetText("Change font (" .. font .. ")")
 			end)
@@ -359,7 +359,7 @@ function TOOL.BuildCPanel(CPanel)
 			Description = "Line " .. i
 		})
 
-		labels[i]:SetFont(textscreenFonts[fontnum].."_MENU")
+		labels[i]:SetFont(textscreenFonts[fontnum] .. "_MENU")
 		labels[i]:SetAutoStretchVertical(true)
 		labels[i]:SetDisabled(true)
 		labels[i]:SetHeight(50)

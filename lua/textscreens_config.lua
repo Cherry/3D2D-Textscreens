@@ -5,7 +5,7 @@ local function addFont(font, t)
 		t.size = 100
 		surface.CreateFont(font, t)
 		t.size = 50
-		surface.CreateFont(font.."_MENU", t)
+		surface.CreateFont(font .. "_MENU", t)
 	end
 
 	table.insert(textscreenFonts, font)

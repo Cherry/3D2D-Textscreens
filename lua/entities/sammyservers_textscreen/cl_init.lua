@@ -61,7 +61,7 @@ local function Draw3D2D(ang, pos, camangle, data)
 
 	for i = 1, data[LEN] do
 		if not data[i] or not data[i][TEXT] then continue end
-		
+
 		cam.Start3D2D(pos, camangle, data[i][CAMSIZE] )
 			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 			-- Font
@@ -127,7 +127,7 @@ local function AddDrawingInfo(ent, rawData)
 		-- Text
 		drawData[i][TEXT] = rawData[i].text
 		-- Font
-		drawData[i][FONT] = (ValidFont(rawData[i].font) or textscreenFonts[1]) 
+		drawData[i][FONT] = (ValidFont(rawData[i].font) or textscreenFonts[1])
 		-- Text size
 		surface.SetFont(drawData[i][FONT])
 		textSize[i][1], textSize[i][2] = surface.GetTextSize(drawData[i][TEXT])
@@ -154,7 +154,7 @@ local function AddDrawingInfo(ent, rawData)
 		-- Calculate the cam.Start3D2D size based on the size of the font
 		drawData[i][CAMSIZE] = (0.25 * drawData[i][SIZE]) / 100
 		-- Use the CAMSIZE to "scale" the POSY
-		drawData[i][POSY] = (0.25 / (drawData[i][CAMSIZE]) * drawData[i][POSY])
+		drawData[i][POSY] = (0.25 / drawData[i][CAMSIZE] * drawData[i][POSY])
 		-- Highest line to lowest, so that everything is central
 		currentHeight = currentHeight + textSize[i][2]
 	end
