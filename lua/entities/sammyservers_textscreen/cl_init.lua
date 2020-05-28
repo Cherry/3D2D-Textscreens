@@ -17,6 +17,8 @@ local POSX = 3
 local POSY = 4
 local COL = 5
 local LEN = 6
+local SIZE = 7
+local CAMSIZE = 8
 
 -- Make ply:ShouldDrawLocalPlayer() never get called more than once a frame
 hook.Add("Think", "ss_should_draw_both_sides", function()
@@ -53,14 +55,15 @@ local function IsInFront(entPos, plyShootPos, direction)
 	return product < 0
 end
 
+
 -- Draws the 3D2D text with the given positions, angles and data(text/font/col)
 local function Draw3D2D(ang, pos, camangle, data)
-	cam.Start3D2D(pos, camangle, .25)
-		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 
-		-- Loop through each line
-		for i = 1, data[LEN] do
-			if not data[i] or not data[i][TEXT] then continue end
+	for i = 1, data[LEN] do
+		if not data[i] or not data[i][TEXT] then continue end
+		
+		cam.Start3D2D(pos, camangle, data[i][CAMSIZE] )
+			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 			-- Font
 			surface.SetFont(data[i][FONT])
 			-- Posistion
@@ -69,10 +72,11 @@ local function Draw3D2D(ang, pos, camangle, data)
 			surface.SetTextColor(data[i][COL])
 			-- Text
 			surface.DrawText(data[i][TEXT])
-		end
 
-		render.PopFilterMin()
-	cam.End3D2D()
+			render.PopFilterMin()
+		cam.End3D2D()
+	end
+
 end
 
 local plyShootPos, ang, pos, camangle, showFront, data -- Less variables being created each frame
@@ -123,16 +127,21 @@ local function AddDrawingInfo(ent, rawData)
 		-- Text
 		drawData[i][TEXT] = rawData[i].text
 		-- Font
-		drawData[i][FONT] = (ValidFont(rawData[i].font) or textscreenFonts[1]) .. rawData[i].size
+		drawData[i][FONT] = "TEXTSCREEN_"..(ValidFont(rawData[i].font) or textscreenFonts[1]) 
 		-- Text size
 		surface.SetFont(drawData[i][FONT])
 		textSize[i][1], textSize[i][2] = surface.GetTextSize(drawData[i][TEXT])
+		textSize[i][2] = rawData[i].size
 		-- Workout max width for render bounds
 		maxWidth = maxWidth > textSize[i][1] and maxWidth or textSize[i][1]
 		-- Position
 		totalHeight = totalHeight + textSize[i][2]
 		-- Colour
 		drawData[i][COL] = Color(rawData[i].color.r, rawData[i].color.g, rawData[i].color.b, 255)
+		-- Size
+		drawData[i][SIZE] = rawData[i]["size"]
+		-- Remove text if text is empty so we don't waste performance
+		if string.len(drawData[i][TEXT]) == 0 or string.len(string.Replace( drawData[i][TEXT], " ", "" )) == 0 then drawData[i][TEXT] = nil end
 	end
 
 	-- Sort out heights
@@ -142,6 +151,10 @@ local function AddDrawingInfo(ent, rawData)
 		drawData[i][POSX] = math.ceil(-textSize[i][1] / 2)
 		-- The y position at which to draw the text relative to the text screen entity
 		drawData[i][POSY] = math.ceil(-(totalHeight / 2) + currentHeight)
+		-- Calculate the cam.Start3D2D size based on the size of the font
+		drawData[i][CAMSIZE] = (0.25 * drawData[i][SIZE]) / 100
+		-- Use the CAMSIZE to "scale" the POSY
+		drawData[i][POSY] = (0.25 / (drawData[i][CAMSIZE]) * drawData[i][POSY])
 		-- Highest line to lowest, so that everything is central
 		currentHeight = currentHeight + textSize[i][2]
 	end

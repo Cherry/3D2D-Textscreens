@@ -2,10 +2,8 @@ textscreenFonts = {}
 
 local function addFont(font, t)
 	if CLIENT then
-		for i = 1, 100 do
-			t.size = i
-			surface.CreateFont(font .. i, t)
-		end
+		t.size = 100
+		surface.CreateFont("TEXTSCREEN_"..font, t)
 	end
 
 	table.insert(textscreenFonts, font)
