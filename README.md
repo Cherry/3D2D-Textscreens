@@ -3,7 +3,8 @@
 [<img src="https://up.jross.me/textscreens/nodecraft-logo-light.svg" alt="Powered by Nodecraft" width="300px">](https://nodecraft.com/r/textscreens)
 
 [![Actions Status](https://github.com/Cherry/3D2D-Textscreens/workflows/Lint/badge.svg)](https://github.com/Cherry/3D2D-Textscreens/actions)
-[![Steam Workshop Subscribers](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-steam-workshop.jross.me%2F109643223&style=for-the-badge)](https://steamcommunity.com/sharedfiles/filedetails/?id=109643223)
+[![Steam Workshop Subscribers](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-steam-workshop.jross.me%2F109643223)](https://steamcommunity.com/sharedfiles/filedetails/?id=109643223)
+[![Crowdin](https://badges.crowdin.net/3d2d-textscreens/localized.svg)](https://crowdin.com/project/3d2d-textscreens)
 > This addon can be installed via the [Steam Workshop for Garry's Mod](https://steamcommunity.com/sharedfiles/filedetails/?id=109643223) - I do not recommend manually installing this addon via git.
 
 ## Features: 
