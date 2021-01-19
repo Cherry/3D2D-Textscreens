@@ -21,5 +21,6 @@
 	"prettyprint_spaceAfterComma": true,
 	"prettyprint_semicolons": false,
 	"prettyprint_cStyle": false,
-	"prettyprint_indentation": "	"
+	"prettyprint_indentation": "\t",
+	"log_format": "auto"
 }
