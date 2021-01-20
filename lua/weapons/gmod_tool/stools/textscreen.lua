@@ -6,6 +6,7 @@ local textBox = {}
 local lineLabels = {}
 local labels = {}
 local sliders = {}
+local rainbowCheckboxes = {}
 local textscreenFonts = textscreenFonts
 
 for i = 1, 5 do
@@ -16,6 +17,7 @@ for i = 1, 5 do
 	TOOL.ClientConVar["b" .. i] = 255
 	TOOL.ClientConVar["a" .. i] = 255
 	TOOL.ClientConVar["font" .. i] = 1
+	TOOL.ClientConVar["rainbow" .. i] = 0
 end
 
 cleanup.Register("textscreens")
@@ -70,7 +72,9 @@ function TOOL:LeftClick(tr)
 			),
 			tonumber(self:GetClientInfo("size" .. i)) or 20,
 			-- font
-			tonumber(self:GetClientInfo("font" .. i)) or 1
+			tonumber(self:GetClientInfo("font" .. i)) or 1,
+
+			tonumber(self:GetClientInfo("rainbow" .. i)) or 0
 		)
 	end
 
@@ -95,7 +99,9 @@ function TOOL:RightClick(tr)
 				),
 				tonumber(self:GetClientInfo("size" .. i)) or 20,
 				-- font
-				tonumber(self:GetClientInfo("font" .. i)) or 1
+				tonumber(self:GetClientInfo("font" .. i)) or 1,
+
+				tonumber(self:GetClientInfo("rainbow" .. i)) or 0
 			)
 		end
 
@@ -118,6 +124,7 @@ function TOOL:Reload(tr)
 		RunConsoleCommand("textscreen_size" .. i, linedata.size)
 		RunConsoleCommand("textscreen_text" .. i, linedata.text)
 		RunConsoleCommand("textscreen_font" .. i, linedata.font)
+		RunConsoleCommand("textscreen_rainbow" .. i, linedata.rainbow)
 	end
 
 	return true
@@ -207,6 +214,12 @@ function TOOL.BuildCPanel(CPanel)
 			ResetFont({1, 2, 3, 4, 5}, false)
 		end)
 
+		menu:AddOption("Reset Rainbow", function()
+			for i = 1, 5 do
+				rainbowCheckboxes[i]:SetValue(0)
+			end
+		end)
+
 		menu:AddOption("Reset everything", function()
 			for i = 1, 5 do
 				RunConsoleCommand("textscreen_r" .. i, 255)
@@ -218,6 +231,7 @@ function TOOL.BuildCPanel(CPanel)
 				RunConsoleCommand("textscreen_text" .. i, "")
 				RunConsoleCommand("textscreen_font" .. i, 1)
 				textBox[i]:SetValue("")
+				rainbowCheckboxes[i]:SetValue(0)
 			end
 			ResetFont({1, 2, 3, 4, 5}, true)
 		end)
@@ -319,6 +333,14 @@ function TOOL.BuildCPanel(CPanel)
 			ShowRGB = 1,
 			Multiplier = 255
 		})
+
+		rainbowCheckboxes[i] = vgui.Create("DCheckBoxLabel")
+		rainbowCheckboxes[i]:SetText("Rainbow Text")
+		rainbowCheckboxes[i]:SetTextColor(Color(0,0,0,255))
+		rainbowCheckboxes[i]:SetConVar("textscreen_rainbow" .. i)
+		rainbowCheckboxes[i]:SetTooltip("Enable for rainbow text")
+		rainbowCheckboxes[i]:SetValue(GetConVar("textscreen_rainbow" .. i))
+		CPanel:AddItem(rainbowCheckboxes[i])
 
 		sliders[i] = vgui.Create("DNumSlider")
 		sliders[i]:SetText("Font size")
