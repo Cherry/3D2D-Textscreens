@@ -19,6 +19,7 @@ local COL = 5
 local LEN = 6
 local SIZE = 7
 local CAMSIZE = 8
+local RAINBOW = 9
 
 -- Make ply:ShouldDrawLocalPlayer() never get called more than once a frame
 hook.Add("Think", "ss_should_draw_both_sides", function()
@@ -68,10 +69,20 @@ local function Draw3D2D(ang, pos, camangle, data)
 			surface.SetFont(data[i][FONT])
 			-- Posistion
 			surface.SetTextPos(data[i][POSX], data[i][POSY])
-			-- Colour
-			surface.SetTextColor(data[i][COL])
-			-- Text
-			surface.DrawText(data[i][TEXT])
+			-- Rainbow
+			if data[i][RAINBOW] ~= 0 then
+				for j = 1, #data[i][TEXT] do
+					--Color
+					surface.SetTextColor(HSVToColor((CurTime() * 60 + (j * 5)) % 360, 1, 1))
+					--Text
+					surface.DrawText(data[i][TEXT][j])
+				end
+			else
+				--Color
+				surface.SetTextColor(data[i][COL])
+				--Text
+				surface.DrawText(data[i][TEXT])
+			end
 
 			render.PopFilterMin()
 		cam.End3D2D()
@@ -142,6 +153,8 @@ local function AddDrawingInfo(ent, rawData)
 		drawData[i][SIZE] = rawData[i]["size"]
 		-- Remove text if text is empty so we don't waste performance
 		if string.len(drawData[i][TEXT]) == 0 or string.len(string.Replace( drawData[i][TEXT], " ", "" )) == 0 then drawData[i][TEXT] = nil end
+		--Rainbow
+		drawData[i][RAINBOW] = rawData[i]["rainbow"]
 	end
 
 	-- Sort out heights
