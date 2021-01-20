@@ -32,6 +32,9 @@ function TOOL:LeftClick(tr)
 	if (tr.Entity:GetClass() == "player") then return false end
 	if (CLIENT) then return true end
 	local ply = self:GetOwner()
+
+	if hook.Run("PlayerSpawnTextscreen", ply, tr) == false then return false end
+
 	if not (self:GetWeapon():CheckLimit("textscreens")) then return false end
 	-- ensure at least 1 line of the textscreen has text before creating entity
 	local hasText = false
