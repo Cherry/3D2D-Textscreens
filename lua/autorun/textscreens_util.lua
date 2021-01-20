@@ -98,7 +98,7 @@ if SERVER then
 			textScreen:SetMoveType(MOVETYPE_NONE)
 
 			for lineNum, lineData in pairs(v.lines or {}) do
-				textScreen:SetLine(lineNum, lineData.text, Color(lineData.color.r, lineData.color.g, lineData.color.b, lineData.color.a), lineData.size, lineData.font)
+				textScreen:SetLine(lineNum, lineData.text, Color(lineData.color.r, lineData.color.g, lineData.color.b, lineData.color.a), lineData.size, lineData.font, lineData.rainbow or 0)
 			end
 
 			textScreen:SetIsPersisted(true)
