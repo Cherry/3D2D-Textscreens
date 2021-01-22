@@ -78,7 +78,7 @@ local function Draw3D2D(ang, pos, camangle, data)
 			if data[i][RAINBOW] ~= 0 then
 				for j = 1, #data[i][TEXT] do
 					--Color
-					if(render_rainbow ~= 0) then
+					if render_rainbow ~= 0 then
 						surface.SetTextColor(HSVToColor((CurTime() * 60 + (j * 5)) % 360, 1, 1))
 					else
 						-- Render as solid white if ss_render_rainbow is disabled
