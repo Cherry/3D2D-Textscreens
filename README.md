@@ -24,7 +24,7 @@
 
 ## User Customisation
 * `ss_render_range` controls how far textscreens have to be away from you in order to render (default `1500`). Setting this to a lower number can help with lag on older machines
-* `render_rainbow` controls if rainbow textscreens should actually rotate their colours, or render as solid white (default enabled `1`). `0` will cause them to render as solid white, which can be beneficial for accessibility
+* `ss_render_rainbow` controls if rainbow textscreens should actually rotate their colours, or render as solid white (default enabled `1`). `0` will cause them to render as solid white, which can be beneficial for accessibility
 
 ## Server owners
 * `sbox_maxtextscreens` controls the maximum amount of text screens that each player can spawn. This defaults to 1. This cvar only exists on the server, so make sure it's set via RCON, or in something like server.cfg.
