@@ -75,7 +75,7 @@ local function Draw3D2D(ang, pos, camangle, data)
 			-- Position
 			surface.SetTextPos(data[i][POSX], data[i][POSY])
 			-- Rainbow
-			if data[i][RAINBOW] ~= 0 then
+			if data[i][RAINBOW] ~= nil and DATA[i][RAINBOW] ~= 0 then
 				for j = 1, #data[i][TEXT] do
 					--Color
 					if render_rainbow ~= 0 then
