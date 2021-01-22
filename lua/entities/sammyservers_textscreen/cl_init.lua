@@ -164,7 +164,7 @@ local function AddDrawingInfo(ent, rawData)
 		-- Remove text if text is empty so we don't waste performance
 		if string.len(drawData[i][TEXT]) == 0 or string.len(string.Replace( drawData[i][TEXT], " ", "" )) == 0 then drawData[i][TEXT] = nil end
 		--Rainbow
-		drawData[i][RAINBOW] = rawData[i]["rainbow"]
+		drawData[i][RAINBOW] = rawData[i]["rainbow"] or 0
 	end
 
 	-- Sort out heights
