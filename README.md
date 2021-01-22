@@ -7,7 +7,7 @@
 [![Crowdin](https://badges.crowdin.net/3d2d-textscreens/localized.svg)](https://crowdin.com/project/3d2d-textscreens)
 > This addon can be installed via the [Steam Workshop for Garry's Mod](https://steamcommunity.com/sharedfiles/filedetails/?id=109643223) - I do not recommend manually installing this addon via git.
 
-## Features:
+## Features
 * Create 3D2D text anywhere in the world
 * Rotate and manipulate this text simply via your physgun
 * Up to 5 lines of text
@@ -26,13 +26,20 @@
 * `ss_render_range` controls how far textscreens have to be away from you in order to render (default `1500`). Setting this to a lower number can help with lag on older machines
 * `render_rainbow` controls if rainbow textscreens should actually rotate their colours, or render as solid white (default enabled `1`). `0` will cause them to render as solid white, which can be beneficial for accessibility
 
-## Server owners:
+## Server owners
 * `sbox_maxtextscreens` controls the maximum amount of text screens that each player can spawn. This defaults to 1. This cvar only exists on the server, so make sure it's set via RCON, or in something like server.cfg.
 * Set `ss_call_to_home 1` on your server to provide anonymous analytics including your operating system, version of the addon, and rough, anonymised geo-location. This is entirely optional and used solely to put a smile on my face.
 * To install this onto your server, follow the instructions [listed here](https://wiki.garrysmod.com/page/Workshop_for_Dedicated_Servers).
 
+### Prevent specific users/groups from using textscreens
+This addon supports a `PlayerSpawnTextscreen` hook that passes the player context. If this hook returns false, the player will be prevented from spawning a textscreen. For example:
+```lua
+hook.Add("PlayerSpawnTextscreen", "MyCustomTextscreensSpawnFunc", function(ply)
+	return ply:IsVIP()
+end)
+```
 
-### Custom admin permissions:
+### Custom admin permissions
 This addon supports custom permissions via the use of a `TextscreensCanAdmin` hook. When this hook isn't present, or doesn't return anything, it defaults to an `IsSuperAdmin` check. If you want to override this behaviour for your own admin permissions, create a hook that exists both server *and* client side, similar to the following:
 ```lua
 hook.Add("TextscreensCanAdmin", "MyCustomAdminFunc", function(ply)
