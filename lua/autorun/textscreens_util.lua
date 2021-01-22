@@ -18,7 +18,7 @@ if SERVER then
 	CreateConVar("sbox_maxtextscreens", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
 	CreateConVar("ss_call_to_home", 0, {FCVAR_NOTIFY, FCVAR_REPLICATED})
 
-	local version = "1.16.0"
+	local version = "1.17.0"
 
 	local function GetOS()
 		if system.IsLinux() then return "linux" end
@@ -98,7 +98,7 @@ if SERVER then
 			textScreen:SetMoveType(MOVETYPE_NONE)
 
 			for lineNum, lineData in pairs(v.lines or {}) do
-				textScreen:SetLine(lineNum, lineData.text, Color(lineData.color.r, lineData.color.g, lineData.color.b, lineData.color.a), lineData.size, lineData.font)
+				textScreen:SetLine(lineNum, lineData.text, Color(lineData.color.r, lineData.color.g, lineData.color.b, lineData.color.a), lineData.size, lineData.font, lineData.rainbow or 0)
 			end
 
 			textScreen:SetIsPersisted(true)

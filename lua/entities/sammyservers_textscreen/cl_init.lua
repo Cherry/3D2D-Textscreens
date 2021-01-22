@@ -1,6 +1,7 @@
 include("shared.lua")
 
 local render_convar_range = CreateClientConVar("ss_render_range", 1500, true, false, "Determines the render range for Textscreens. Default 1500")
+local render_rainbow = CreateClientConVar("ss_render_rainbow", 1, true, false, "Determines if rainbow screens are rendered. If disabled (0), will render as solid white. Default enabled (1)", 0, 1)
 local render_range = render_convar_range:GetInt() * render_convar_range:GetInt() --We multiply this is that we can use DistToSqr instead of Distance so we don't need to workout the square root all the time
 local textscreenFonts = textscreenFonts
 local screenInfo = {}
@@ -19,6 +20,7 @@ local COL = 5
 local LEN = 6
 local SIZE = 7
 local CAMSIZE = 8
+local RAINBOW = 9
 
 -- Make ply:ShouldDrawLocalPlayer() never get called more than once a frame
 hook.Add("Think", "ss_should_draw_both_sides", function()
@@ -37,6 +39,10 @@ end
 
 cvars.AddChangeCallback("ss_render_range", function(convar_name, value_old, value_new)
 	render_range = tonumber(value_new) * tonumber(value_new)
+end, "3D2DScreens")
+
+cvars.AddChangeCallback("ss_render_rainbow", function(convar_name, value_old, value_new)
+	render_rainbow = tonumber(value_new)
 end, "3D2DScreens")
 
 function ENT:Initialize()
@@ -66,12 +72,27 @@ local function Draw3D2D(ang, pos, camangle, data)
 			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 			-- Font
 			surface.SetFont(data[i][FONT])
-			-- Posistion
+			-- Position
 			surface.SetTextPos(data[i][POSX], data[i][POSY])
-			-- Colour
-			surface.SetTextColor(data[i][COL])
-			-- Text
-			surface.DrawText(data[i][TEXT])
+			-- Rainbow
+			if data[i][RAINBOW] ~= 0 then
+				for j = 1, #data[i][TEXT] do
+					--Color
+					if render_rainbow ~= 0 then
+						surface.SetTextColor(HSVToColor((CurTime() * 60 + (j * 5)) % 360, 1, 1))
+					else
+						-- Render as solid white if ss_render_rainbow is disabled
+						surface.SetTextColor(255, 255, 255)
+					end
+					--Text
+					surface.DrawText(data[i][TEXT][j])
+				end
+			else
+				--Color
+				surface.SetTextColor(data[i][COL])
+				--Text
+				surface.DrawText(data[i][TEXT])
+			end
 
 			render.PopFilterMin()
 		cam.End3D2D()
@@ -142,6 +163,8 @@ local function AddDrawingInfo(ent, rawData)
 		drawData[i][SIZE] = rawData[i]["size"]
 		-- Remove text if text is empty so we don't waste performance
 		if string.len(drawData[i][TEXT]) == 0 or string.len(string.Replace( drawData[i][TEXT], " ", "" )) == 0 then drawData[i][TEXT] = nil end
+		--Rainbow
+		drawData[i][RAINBOW] = rawData[i]["rainbow"]
 	end
 
 	-- Sort out heights

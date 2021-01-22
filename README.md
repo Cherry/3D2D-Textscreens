@@ -7,20 +7,24 @@
 [![Crowdin](https://badges.crowdin.net/3d2d-textscreens/localized.svg)](https://crowdin.com/project/3d2d-textscreens)
 > This addon can be installed via the [Steam Workshop for Garry's Mod](https://steamcommunity.com/sharedfiles/filedetails/?id=109643223) - I do not recommend manually installing this addon via git.
 
-## Features: 
-* Create 3D2D text anywhere in the world 
-* Rotate and manipulate this text simply via your physgun 
-* Up to 5 lines of text 
+## Features:
+* Create 3D2D text anywhere in the world
+* Rotate and manipulate this text simply via your physgun
+* Up to 5 lines of text
 * Multiple different fonts, font sizes, and colours
 * Heavily optimised
-  * Full scale testing on a highly popular RP server 
-  * Draw distance optimisations 
+  * Full scale testing on a highly popular RP server
+  * Draw distance optimisations
   * Minimal FPS hit
 * Permanent text screens
   * Hold C for context menu, right click on the textscreen, and make the text screen permanent (only works for admins). This is perfect for welcome messages or rules.
 * Presets
   * Define preset textscreen data (size, text, colours, etc) and save/load these for future use at any time. This is very useful to trying to replicate multiple textscreens across maps.
 
+
+## User Customisation
+* `ss_render_range` controls how far textscreens have to be away from you in order to render (default `1500`). Setting this to a lower number can help with lag on older machines
+* `render_rainbow` controls if rainbow textscreens should actually rotate their colours, or render as solid white (default enabled `1`). `0` will cause them to render as solid white, which can be beneficial for accessibility
 
 ## Server owners:
 * `sbox_maxtextscreens` controls the maximum amount of text screens that each player can spawn. This defaults to 1. This cvar only exists on the server, so make sure it's set via RCON, or in something like server.cfg.
