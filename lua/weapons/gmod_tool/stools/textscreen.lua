@@ -214,7 +214,7 @@ function TOOL.BuildCPanel(CPanel)
 			ResetFont({1, 2, 3, 4, 5}, false)
 		end)
 
-		menu:AddOption("Reset Rainbow", function()
+		menu:AddOption("Reset rainbow", function()
 			for i = 1, 5 do
 				rainbowCheckboxes[i]:SetValue(0)
 			end
@@ -334,12 +334,14 @@ function TOOL.BuildCPanel(CPanel)
 			Multiplier = 255
 		})
 
+		print("textscreen_rainbow" .. i)
+		print(GetConVar("textscreen_rainbow" .. i):GetInt())
 		rainbowCheckboxes[i] = vgui.Create("DCheckBoxLabel")
 		rainbowCheckboxes[i]:SetText("Rainbow Text")
 		rainbowCheckboxes[i]:SetTextColor(Color(0,0,0,255))
 		rainbowCheckboxes[i]:SetConVar("textscreen_rainbow" .. i)
 		rainbowCheckboxes[i]:SetTooltip("Enable for rainbow text")
-		rainbowCheckboxes[i]:SetValue(GetConVar("textscreen_rainbow" .. i))
+		rainbowCheckboxes[i]:SetValue(GetConVar("textscreen_rainbow" .. i):GetInt())
 		CPanel:AddItem(rainbowCheckboxes[i])
 
 		sliders[i] = vgui.Create("DNumSlider")
