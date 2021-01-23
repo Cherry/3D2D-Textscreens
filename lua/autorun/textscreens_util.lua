@@ -11,14 +11,19 @@ local function checkAdmin(ply)
 	return canAdmin
 end
 
+-- allow servers to disable rainbow effect for everyone
+CreateConVar("ss_enable_rainbow", 1, {FCVAR_NOTIFY, FCVAR_REPLICATED}, "Determines whether rainbow textscreens will render for all clients. When disabled, rainbow screens will render as solid white.", 0, 1)
+
 if SERVER then
 	AddCSLuaFile()
 	AddCSLuaFile("textscreens_config.lua")
 	include("textscreens_config.lua")
-	CreateConVar("sbox_maxtextscreens", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED})
-	CreateConVar("ss_call_to_home", 0, {FCVAR_NOTIFY, FCVAR_REPLICATED})
+	CreateConVar("sbox_maxtextscreens", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED}, "Determines the maximum number of textscreens users can spawn.")
+	CreateConVar("ss_call_to_home", 0, {FCVAR_NOTIFY, FCVAR_REPLICATED}, "Determines whether anonymous usage analytics can be sent to the addon author.", 0, 1)
 
-	local version = "1.17.3"
+	--local rainbow_enabled = cvars.Number('ss_enable_rainbow', 1)
+
+	local version = "1.18.0"
 
 	local function GetOS()
 		if system.IsLinux() then return "linux" end

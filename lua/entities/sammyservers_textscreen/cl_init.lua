@@ -3,6 +3,7 @@ include("shared.lua")
 local render_convar_range = CreateClientConVar("ss_render_range", 1500, true, false, "Determines the render range for Textscreens. Default 1500")
 local render_rainbow = CreateClientConVar("ss_render_rainbow", 1, true, false, "Determines if rainbow screens are rendered. If disabled (0), will render as solid white. Default enabled (1)", 0, 1)
 local render_range = render_convar_range:GetInt() * render_convar_range:GetInt() --We multiply this is that we can use DistToSqr instead of Distance so we don't need to workout the square root all the time
+local rainbow_enabled = cvars.Number("ss_enable_rainbow", 1)
 local textscreenFonts = textscreenFonts
 local screenInfo = {}
 local shouldDrawBoth = false
@@ -45,6 +46,12 @@ cvars.AddChangeCallback("ss_render_rainbow", function(convar_name, value_old, va
 	render_rainbow = tonumber(value_new)
 end, "3D2DScreens")
 
+-- TODO: https://github.com/Facepunch/garrysmod-issues/issues/3740
+-- cvars.AddChangeCallback("ss_enable_rainbow", function(convar_name, value_old, value_new)
+-- 	print('ss_enable_rainbow changed: '.. value_new)
+-- 	rainbow_enabled = tonumber(value_new)
+-- end, "3D2DScreens")
+
 function ENT:Initialize()
 	self:SetMaterial("models/effects/vol_light001")
 	self:SetRenderMode(RENDERMODE_NONE)
@@ -78,10 +85,10 @@ local function Draw3D2D(ang, pos, camangle, data)
 			if data[i][RAINBOW] ~= nil and data[i][RAINBOW] ~= 0 then
 				for j = 1, #data[i][TEXT] do
 					--Color
-					if render_rainbow ~= 0 then
+					if rainbow_enabled == 1 and render_rainbow ~= 0 then
 						surface.SetTextColor(HSVToColor((CurTime() * 60 + (j * 5)) % 360, 1, 1))
 					else
-						-- Render as solid white if ss_render_rainbow is disabled
+						-- Render as solid white if ss_render_rainbow is disabled or server disabled via ss_enable_rainbow
 						surface.SetTextColor(255, 255, 255)
 					end
 					--Text
