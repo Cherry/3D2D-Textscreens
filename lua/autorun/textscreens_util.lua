@@ -76,7 +76,7 @@ if SERVER then
 	local function SpawnPermaTextscreens()
 		print("[3D2D Textscreens] Spawning textscreens...")
 		textscreens = file.Read("sammyservers_textscreens.txt", "DATA")
-		if not textscreens or textscreens == "" then
+		if not textscreens or textscreens == "[]" then
 			textscreens = {}
 			print("[3D2D Textscreens] Spawned 0 textscreens for map " .. game.GetMap())
 			return
