@@ -88,11 +88,11 @@ end
 function TOOL:RightClick(tr)
 	if (tr.Entity:GetClass() == "player") then return false end
 	if (CLIENT) then return true end
-	local TraceEnt = tr.Entity
+	local traceEnt = tr.Entity
 
-	if (IsValid(TraceEnt) and TraceEnt:GetClass() == "sammyservers_textscreen") then
+	if (IsValid(TraceEnt) and traceEnt:GetClass() == "sammyservers_textscreen") then
 		for i = 1, 5 do
-			TraceEnt:SetLine(
+			traceEnt:SetLine(
 				i, -- Line
 				tostring(self:GetClientInfo("text" .. i)), -- text
 				Color( -- Color
@@ -109,18 +109,18 @@ function TOOL:RightClick(tr)
 			)
 		end
 
-		TraceEnt:Broadcast()
+		traceEnt:Broadcast()
 
 		return true
 	end
 end
 
 function TOOL:Reload(tr)
-	local TraceEnt = tr.Entity
-	if (not isentity(TraceEnt) or TraceEnt:GetClass() ~= "sammyservers_textscreen") then return false end
+	local traceEnt = tr.Entity
+	if (not isentity(traceEnt) or traceEnt:GetClass() ~= "sammyservers_textscreen") then return false end
 
 	for i = 1, 5 do
-		local linedata = TraceEnt.lines[i]
+		local linedata = traceEnt.lines[i]
 		RunConsoleCommand("textscreen_r" .. i, linedata.color.r)
 		RunConsoleCommand("textscreen_g" .. i, linedata.color.g)
 		RunConsoleCommand("textscreen_b" .. i, linedata.color.b)
@@ -134,7 +134,7 @@ function TOOL:Reload(tr)
 	return true
 end
 
-local ConVarsDefault = TOOL:BuildConVarList()
+local conVarsDefault = TOOL:BuildConVarList()
 
 function TOOL.BuildCPanel(CPanel)
 	local logo = vgui.Create("DImage", CPanel)
@@ -318,9 +318,9 @@ function TOOL.BuildCPanel(CPanel)
 		MenuButton = 1,
 		Folder = "textscreen",
 		Options = {
-			["#preset.default"] = ConVarsDefault
+			["#preset.default"] = conVarsDefault
 		},
-		CVars = table.GetKeys(ConVarsDefault)
+		CVars = table.GetKeys(conVarsDefault)
 	})
 
 	for i = 1, 5 do

@@ -14,6 +14,7 @@
 	"lint_unusedVars": true,
 	"lint_unusedParameters": false,
 	"lint_unusedLoopVars": false,
+	"lint_inconsistentVariableStyle": false,
 	"prettyprint_spaceAfterParens": false,
 	"prettyprint_spaceAfterBrackets": false,
 	"prettyprint_spaceAfterBraces": false,
