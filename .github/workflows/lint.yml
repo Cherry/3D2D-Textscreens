@@ -10,7 +10,7 @@ jobs:
     - name: Download GLuaLint
       run: curl -o glualint.zip -L https://github.com/FPtje/GLuaFixer/releases/download/$GLUALINT_VERSION/glualint-$GLUALINT_VERSION-linux.zip
       env:
-        GLUALINT_VERSION: 1.18.2
+        GLUALINT_VERSION: 1.19.1
     - name: Unzip GLuaLint
       run: unzip glualint.zip
     - name: Lint lua files
