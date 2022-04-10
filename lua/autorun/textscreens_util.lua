@@ -23,7 +23,7 @@ if SERVER then
 
 	--local rainbow_enabled = cvars.Number('ss_enable_rainbow', 1)
 
-	local version = "1.18.0"
+	local version = "1.18.1"
 
 	local function GetOS()
 		if system.IsLinux() then return "linux" end

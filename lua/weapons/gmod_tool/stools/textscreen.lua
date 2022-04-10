@@ -29,6 +29,20 @@ if (CLIENT) then
 		{ name = "right" },
 		{ name = "reload" },
 	}
+	-- Add default english language strings here, in case no localisation exists
+	language.Add("tool.textscreen.name", "3D2D Textscreen")
+	language.Add("tool.textscreen.desc", "Create a textscreen with multiple lines, font colours and sizes.")
+	language.Add("tool.textscreen.left", "Spawn a textscreen.") -- Does not work with capital T in tool. Same with right and reload.
+	language.Add("tool.textscreen.right", "Update textscreen with settings.")
+	language.Add("tool.textscreen.reload", "Copy textscreen.")
+	language.Add("Undone.textscreens", "Undone textscreen")
+	language.Add("Undone_textscreens", "Undone textscreen")
+	language.Add("Cleanup.textscreens", "Textscreens")
+	language.Add("Cleanup_textscreens", "Textscreens")
+	language.Add("Cleaned.textscreens", "Cleaned up all textscreens")
+	language.Add("Cleaned_textscreens", "Cleaned up all textscreens")
+	language.Add("SBoxLimit.textscreens", "You've hit the textscreen limit!")
+	language.Add("SBoxLimit_textscreens", "You've hit the textscreen limit!")
 end
 
 function TOOL:LeftClick(tr)
