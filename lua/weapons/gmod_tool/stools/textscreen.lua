@@ -130,6 +130,7 @@ function TOOL:RightClick(tr)
 end
 
 function TOOL:Reload(tr)
+	if (SERVER) then return true end
 	local traceEnt = tr.Entity
 	if (not isentity(traceEnt) or traceEnt:GetClass() ~= "sammyservers_textscreen") then return false end
 
