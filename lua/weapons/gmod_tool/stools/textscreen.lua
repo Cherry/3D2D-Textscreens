@@ -108,7 +108,7 @@ function TOOL:RightClick(tr)
 
 	if (IsValid(TraceEnt) and traceEnt:GetClass() == "sammyservers_textscreen") then
 		for i = 1, 5 do
-			local txt = tostring(self:GetClientInfo("text" .. i)
+			local txt = tostring(self:GetClientInfo("text" .. i))
 			traceEnt:SetLine(
 				i, -- Line
 				max_characters != 0 and string.Left(txt, max_characters) or txt, -- text
