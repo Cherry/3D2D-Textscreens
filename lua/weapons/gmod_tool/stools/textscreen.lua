@@ -83,7 +83,7 @@ function TOOL:LeftClick(tr)
 		local txt = self:GetClientInfo("text" .. i) or ""
 		textScreen:SetLine(
 			i, -- Line
-			max_characters != 0 and string.Left(txt, max_characters) or txt, -- text
+			max_characters ~= 0 and string.Left(txt, max_characters) or txt, -- text
 			Color( -- Color
 				tonumber(self:GetClientInfo("r" .. i)) or 255,
 				tonumber(self:GetClientInfo("g" .. i)) or 255,
@@ -111,7 +111,7 @@ function TOOL:RightClick(tr)
 			local txt = tostring(self:GetClientInfo("text" .. i))
 			traceEnt:SetLine(
 				i, -- Line
-				max_characters != 0 and string.Left(txt, max_characters) or txt, -- text
+				max_characters ~= 0 and string.Left(txt, max_characters) or txt, -- text
 				Color( -- Color
 					tonumber(self:GetClientInfo("r" .. i)) or 255,
 					tonumber(self:GetClientInfo("g" .. i)) or 255,
@@ -388,7 +388,7 @@ function TOOL.BuildCPanel(CPanel)
 			labels[i]:SetText(textBox[i]:GetValue())
 		end
 
-		if max_characters != 0 then
+		if max_characters ~= 0 then
 			textBox[i].AllowInput = function()
 				if string.len(textBox[i]:GetValue()) >= max_characters then return true end
 			end
