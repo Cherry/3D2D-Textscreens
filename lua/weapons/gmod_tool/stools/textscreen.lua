@@ -9,6 +9,7 @@ local sliders = {}
 local rainbowCheckboxes = {}
 local textscreenFonts = textscreenFonts
 local rainbow_enabled = cvars.Number("ss_enable_rainbow", 1)
+local max_characters = cvars.Number("ss_max_characters", 0)
 
 for i = 1, 5 do
 	TOOL.ClientConVar["text" .. i] = ""
@@ -79,9 +80,10 @@ function TOOL:LeftClick(tr)
 	ply:AddCleanup("textscreens", textScreen)
 
 	for i = 1, 5 do
+		local txt = self:GetClientInfo("text" .. i) or ""
 		textScreen:SetLine(
 			i, -- Line
-			self:GetClientInfo("text" .. i) or "", -- text
+			max_characters ~= 0 and string.Left(txt, max_characters) or txt, -- text
 			Color( -- Color
 				tonumber(self:GetClientInfo("r" .. i)) or 255,
 				tonumber(self:GetClientInfo("g" .. i)) or 255,
@@ -106,9 +108,10 @@ function TOOL:RightClick(tr)
 
 	if (IsValid(TraceEnt) and traceEnt:GetClass() == "sammyservers_textscreen") then
 		for i = 1, 5 do
+			local txt = tostring(self:GetClientInfo("text" .. i))
 			traceEnt:SetLine(
 				i, -- Line
-				tostring(self:GetClientInfo("text" .. i)), -- text
+				max_characters ~= 0 and string.Left(txt, max_characters) or txt, -- text
 				Color( -- Color
 					tonumber(self:GetClientInfo("r" .. i)) or 255,
 					tonumber(self:GetClientInfo("g" .. i)) or 255,
@@ -383,6 +386,12 @@ function TOOL.BuildCPanel(CPanel)
 
 		textBox[i].OnTextChanged = function()
 			labels[i]:SetText(textBox[i]:GetValue())
+		end
+
+		if max_characters ~= 0 then
+			textBox[i].AllowInput = function()
+				if string.len(textBox[i]:GetValue()) >= max_characters then return true end
+			end
 		end
 
 		CPanel:AddItem(textBox[i])

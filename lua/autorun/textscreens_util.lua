@@ -14,6 +14,9 @@ end
 -- allow servers to disable rainbow effect for everyone
 CreateConVar("ss_enable_rainbow", 1, {FCVAR_NOTIFY, FCVAR_REPLICATED}, "Determines whether rainbow textscreens will render for all clients. When disabled, rainbow screens will render as solid white.", 0, 1)
 
+-- allow servers to restrict the number of characters per line for everyone
+CreateConVar("ss_max_characters", 0, {FCVAR_NOTIFY, FCVAR_REPLICATED}, "Determines the maximum number of characters per line for all clients. When set to 0, the maximum number of characters is infinite.", 0)
+
 if SERVER then
 	AddCSLuaFile()
 	AddCSLuaFile("textscreens_config.lua")
