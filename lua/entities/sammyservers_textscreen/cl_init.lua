@@ -83,7 +83,9 @@ local function Draw3D2D(ang, pos, camangle, data)
 			surface.SetTextPos(data[i][POSX], data[i][POSY])
 			-- Rainbow
 			if data[i][RAINBOW] ~= nil and data[i][RAINBOW] ~= 0 then
-				for j = 1, #data[i][TEXT] do
+				local j = 0
+				for _, code in utf8.codes(data[i][TEXT]) do
+					j = j + 1
 					--Color
 					if rainbow_enabled == 1 and render_rainbow ~= 0 then
 						surface.SetTextColor(HSVToColor((CurTime() * 60 + (j * 5)) % 360, 1, 1))
@@ -92,7 +94,7 @@ local function Draw3D2D(ang, pos, camangle, data)
 						surface.SetTextColor(255, 255, 255)
 					end
 					--Text
-					surface.DrawText(data[i][TEXT][j])
+					surface.DrawText(utf8.char(code))
 				end
 			else
 				--Color
