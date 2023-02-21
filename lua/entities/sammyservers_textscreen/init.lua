@@ -90,7 +90,7 @@ do
 		now = CurTime()
 		lastSent = updates[ent] or 0
 		if lastSent > ( now - 1 ) then
-		    return false
+			return false
 		end
 
 		updates[ent] = now
@@ -107,16 +107,23 @@ net.Receive("textscreens_download", function(len, ply)
 
 	if not canSendUpdate(ply, ent) then return end
 
-	ent.lines = ent.lines or {}
-	net.Start("textscreens_update")
-		net.WriteEntity(ent)
-		net.WriteTable(ent.lines)
-	net.Send(ply)
+	ent:SendLines(ply)
 end)
 
-function ENT:Broadcast()
+function ENT:SendLines(ply)
+	self.lines = self.lines or {}
+
 	net.Start("textscreens_update")
-		net.WriteEntity(self)
-		net.WriteTable(self.lines)
-	net.Broadcast()
+	net.WriteEntity(self)
+	net.WriteTable(self.lines)
+
+	if ply then
+		net.Send(ply)
+	else
+		net.Broadcast()
+	end
+end
+
+function ENT:Broadcast()
+	self:SendLines(nil)
 end
