@@ -4,6 +4,9 @@ resource.AddFile("materials/textscreens/logo.png")
 
 include("shared.lua")
 
+local CurTime = CurTime
+local IsValid = IsValid
+
 
 function ENT:Initialize()
 	self:SetRenderMode(RENDERMODE_TRANSALPHA)
@@ -73,17 +76,42 @@ function ENT:SetLine(line, text, color, size, font, rainbow)
 	}
 end
 
+local canSendUpdate
+
+do
+	local updates, now, lastSent
+	canSendUpdate = function(ply, ent)
+		updates = ply.TextScreenUpdates
+		if not updates then
+			updates = {}
+			ply.TextScreenUpdates = updates
+		end
+
+		now = CurTime()
+		lastSent = updates[ent] or 0
+		if lastSent > ( now - 1 ) then
+		    return false
+		end
+
+		updates[ent] = now
+		return true
+	end
+end
+
 net.Receive("textscreens_download", function(len, ply)
 	if not IsValid(ply) then return end
 
 	local ent = net.ReadEntity()
-	if IsValid(ent) and ent:GetClass() == "sammyservers_textscreen" then
-		ent.lines = ent.lines or {}
-		net.Start("textscreens_update")
-			net.WriteEntity(ent)
-			net.WriteTable(ent.lines)
-		net.Send(ply)
-	end
+	if not IsValid( ent ) then return end
+	if ent:GetClass() ~= "sammyservers_textscreen" then return end
+
+	if not canSendUpdate(ply, ent) then return end
+
+	ent.lines = ent.lines or {}
+	net.Start("textscreens_update")
+		net.WriteEntity(ent)
+		net.WriteTable(ent.lines)
+	net.Send(ply)
 end)
 
 function ENT:Broadcast()
