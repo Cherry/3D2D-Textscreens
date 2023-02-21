@@ -111,7 +111,7 @@ net.Receive("textscreens_download", function(len, ply)
 end)
 
 function ENT:SendLines(ply)
-	self.lines = self.lines or {}
+	if not self.lines then self.lines = {} end
 
 	net.Start("textscreens_update")
 	net.WriteEntity(self)
