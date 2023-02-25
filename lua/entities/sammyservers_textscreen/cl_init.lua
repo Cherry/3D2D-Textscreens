@@ -22,6 +22,7 @@ local COL = 5
 local SIZE = 7
 local CAMSIZE = 8
 local RAINBOW = 9
+local UTF8CODES = 10
 
 -- Make ply:ShouldDrawLocalPlayer() never get called more than once a frame
 hook.Add("Think", "ss_should_draw_both_sides", function()
@@ -84,7 +85,6 @@ end
 -- Draws the 3D2D text with the given positions, angles and data(text/font/col)
 local function Draw3D2D(ang, pos, camangle, data)
 	local multipliedCurtime = CurTime() * 60
-	local colOffset = 0
 	local speed = 5
 
 	for i, row in ipairs(data) do
@@ -96,13 +96,11 @@ local function Draw3D2D(ang, pos, camangle, data)
 			surface.SetTextPos(row[POSX], row[POSY])
 			-- Rainbow
 			if row[RAINBOW] ~= 0 and rainbow_enabled and render_rainbow then
-				colOffset = 0
-				for _, code in utf8.codes(row[TEXT]) do
-					colOffset = colOffset + speed
+				for i, char in pairs(row[UTF8CODES]) do
 					--Color
-					surface.SetTextColor(toNearestColour((multipliedCurtime - colOffset) % 360))
+					surface.SetTextColor(toNearestColour((multipliedCurtime - i * speed) % 360))
 					--Text
-					surface.DrawText(utf8.char(code))
+					surface.DrawText(char)
 				end
 			else
 				--Color
@@ -162,6 +160,16 @@ local function AddDrawingInfo(ent, rawData)
 		return #str == 0 or #string.Replace(str, " ", "") == 0
 	end
 
+	local function offsetAndUTF8(str)
+		local codes = {}
+		local offset = 0
+		for _, code in utf8.codes(str) do
+			offset = offset + 1
+			codes[offset] = utf8.char(code)
+		end
+		return codes
+	end
+
 	for i = 1, #rawData do
 		-- Setup tables
 		if not rawData[i] or isEmptyString(rawData[i].text) then continue end
@@ -169,6 +177,10 @@ local function AddDrawingInfo(ent, rawData)
 		textSize[i] = {}
 		-- Text
 		drawData[i][TEXT] = rawData[i].text
+		-- UTF8 rainbow
+		if rawData[i].rainbow ~= 0 then
+			drawData[i][UTF8CODES] = offsetAndUTF8(drawData[i][TEXT])
+		end
 		-- Font
 		drawData[i][FONT] = (ValidFont(rawData[i].font) or textscreenFonts[1])
 		-- Text size
