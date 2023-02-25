@@ -72,7 +72,7 @@ end
 local colours = {}
 local colourStep = 1 -- must be multiple of 360, lowering this seems to make no performance difference
 local mathFloor = math.floor -- cheaper than math.Round and close enough
-for i=0, 360-1, colourStep do -- 0 first index, 359 last index, length 360
+for i = 0, 360-1, colourStep do -- 0 first index, 359 last index, length 360
 	colours[i] = HSVToColor(i, 1, 1)
 end
 
@@ -86,7 +86,7 @@ local function Draw3D2D(ang, pos, camangle, data)
 	local multipliedCurtime = CurTime() * 60
 	local speed = 5
 
-	for i, row in ipairs(data) do
+	for _, row in ipairs(data) do
 		cam.Start3D2D(pos, camangle, row[CAMSIZE])
 			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 			-- Font
@@ -95,7 +95,7 @@ local function Draw3D2D(ang, pos, camangle, data)
 			surface.SetTextPos(row[POSX], row[POSY])
 			-- Rainbow
 			if row[RAINBOW] ~= 0 and rainbow_enabled and render_rainbow then
-				for i=1, #row[TEXT] do
+				for i = 1, #row[TEXT] do
 					--Color
 					surface.SetTextColor(toNearestColour((multipliedCurtime - i * speed) % 360))
 					--Text
@@ -153,7 +153,6 @@ local function AddDrawingInfo(ent, rawData)
 	local totalHeight = 0
 	local maxWidth = 0
 	local currentHeight = 0
-	local text = ""
 
 	local function isEmptyString(str)
 		return #str == 0 or #string.Replace(str, " ", "") == 0
