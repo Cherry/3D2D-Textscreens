@@ -3,7 +3,7 @@ include("shared.lua")
 local render_convar_range = CreateClientConVar("ss_render_range", 1500, true, false, "Determines the render range for Textscreens. Default 1500")
 local render_rainbow = CreateClientConVar("ss_render_rainbow", 1, true, false, "Determines if rainbow screens are rendered. If disabled (0), will render as solid white. Default enabled (1)", 0, 1)
 local render_range = render_convar_range:GetInt() * render_convar_range:GetInt() --We multiply this is that we can use DistToSqr instead of Distance so we don't need to workout the square root all the time
-local rainbow_enabled = cvars.Number("ss_enable_rainbow", 1)
+local rainbow_enabled = cvars.Bool("ss_enable_rainbow", true)
 local textscreenFonts = textscreenFonts
 local screenInfo = {}
 local shouldDrawBoth = false
@@ -43,7 +43,7 @@ cvars.AddChangeCallback("ss_render_range", function(convar_name, value_old, valu
 end, "3D2DScreens")
 
 cvars.AddChangeCallback("ss_render_rainbow", function(convar_name, value_old, value_new)
-	render_rainbow = tonumber(value_new)
+	render_rainbow = tobool(value_new)
 end, "3D2DScreens")
 
 -- TODO: https://github.com/Facepunch/garrysmod-issues/issues/3740
@@ -73,7 +73,7 @@ end
 local function Draw3D2D(ang, pos, camangle, data)
 
 	for i = 1, data[LEN] do
-		cam.Start3D2D(pos, camangle, data[i][CAMSIZE] )
+		cam.Start3D2D(pos, camangle, data[i][CAMSIZE])
 			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 			-- Font
 			surface.SetFont(data[i][FONT])
@@ -85,7 +85,7 @@ local function Draw3D2D(ang, pos, camangle, data)
 				for _, code in utf8.codes(data[i][TEXT]) do
 					j = j + 1
 					--Color
-					if rainbow_enabled == 1 and render_rainbow ~= 0 then
+					if rainbow_enabled and render_rainbow then
 						surface.SetTextColor(HSVToColor((CurTime() * 60 + (j * 5)) % 360, 1, 1))
 					else
 						-- Render as solid white if ss_render_rainbow is disabled or server disabled via ss_enable_rainbow
@@ -149,7 +149,7 @@ local function AddDrawingInfo(ent, rawData)
 
 	for i = 1, #rawData do
 		-- Setup tables
-		if not rawData[i] or not rawData[i].text then continue end
+		if not rawData[i] or #rawData[i].text == 0 then continue end
 		drawData[i] = {}
 		textSize[i] = {}
 		-- Text
@@ -176,7 +176,7 @@ local function AddDrawingInfo(ent, rawData)
 
 	-- Sort out heights
 	for i = 1, #rawData do
-		if not rawData[i] or not rawData[i].text then continue end
+		if not rawData[i] or #rawData[i].text == 0 then continue end
 		-- The x position at which to draw the text relative to the text screen entity
 		drawData[i][POSX] = math.ceil(-textSize[i][1] / 2)
 		-- The y position at which to draw the text relative to the text screen entity
