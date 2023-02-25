@@ -87,7 +87,7 @@ local function Draw3D2D(ang, pos, camangle, data)
 	local multipliedCurtime = CurTime() * 60
 	local speed = 5
 
-	for _, row in ipairs(data) do
+	for _, row in pairs(data) do
 		cam.Start3D2D(pos, camangle, row[CAMSIZE])
 			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 			-- Font
