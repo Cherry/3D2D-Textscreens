@@ -79,13 +79,15 @@ end
 
 local function toNearestColour(num)
 	-- num between 0 and 360
-	return colours[mathFloor(num - (num % colourStep))] or colours[0] -- fail safe
+	return colours[mathFloor(num)] or colours[0] -- fail safe
+	-- Below could be useful if we want to support custom colour steps (>1)
+	--return colours[mathFloor(num - (num % colourStep))] or colours[0]
 end
 
 -- Draws the 3D2D text with the given positions, angles and data(text/font/col)
 local function Draw3D2D(ang, pos, camangle, data)
 	local multipliedCurtime = CurTime() * 60
-	local speed = 5
+	local colOffset = 5
 
 	for _, row in pairs(data) do
 		cam.Start3D2D(pos, camangle, row[CAMSIZE])
@@ -98,7 +100,7 @@ local function Draw3D2D(ang, pos, camangle, data)
 			if row[RAINBOW] ~= 0 and rainbow_enabled and render_rainbow then
 				for i, char in pairs(row[UTF8CODES]) do
 					--Color
-					surface.SetTextColor(toNearestColour((multipliedCurtime - i * speed) % 360))
+					surface.SetTextColor(toNearestColour((multipliedCurtime - i * colOffset) % 360))
 					--Text
 					surface.DrawText(char)
 				end
