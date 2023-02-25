@@ -73,8 +73,6 @@ end
 local function Draw3D2D(ang, pos, camangle, data)
 
 	for i = 1, data[LEN] do
-		if not data[i] or not data[i][TEXT] then continue end
-
 		cam.Start3D2D(pos, camangle, data[i][CAMSIZE] )
 			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 			-- Font
@@ -178,7 +176,7 @@ local function AddDrawingInfo(ent, rawData)
 
 	-- Sort out heights
 	for i = 1, #rawData do
-		if not rawData[i] then continue end
+		if not rawData[i] or not rawData[i].text then continue end
 		-- The x position at which to draw the text relative to the text screen entity
 		drawData[i][POSX] = math.ceil(-textSize[i][1] / 2)
 		-- The y position at which to draw the text relative to the text screen entity
