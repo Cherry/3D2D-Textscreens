@@ -80,7 +80,7 @@ local function Draw3D2D(ang, pos, camangle, data)
 			-- Position
 			surface.SetTextPos(data[i][POSX], data[i][POSY])
 			-- Rainbow
-			if data[i][RAINBOW] ~= nil and data[i][RAINBOW] ~= 0 then
+			if data[i][RAINBOW] ~= 0 then
 				local j = 0
 				for _, code in utf8.codes(data[i][TEXT]) do
 					j = j + 1
