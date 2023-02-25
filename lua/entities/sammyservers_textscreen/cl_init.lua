@@ -182,7 +182,7 @@ local function AddDrawingInfo(ent, rawData)
 		-- Colour
 		if rawData[i].rainbow ~= 0 then
 			-- Render as solid white if ss_render_rainbow is disabled or server disabled via ss_enable_rainbow
-			drawData[i][COL] = surface.SetTextColor(255, 255, 255)
+			drawData[i][COL] = Color(255, 255, 255)
 		else
 			drawData[i][COL] = Color(rawData[i].color.r, rawData[i].color.g, rawData[i].color.b, 255)
 		end
