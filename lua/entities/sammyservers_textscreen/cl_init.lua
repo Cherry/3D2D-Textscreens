@@ -18,7 +18,7 @@ local TEXT = 2
 local POSX = 3
 local POSY = 4
 local COL = 5
-local LEN = 6
+-- local LEN = 6 -- unused
 local SIZE = 7
 local CAMSIZE = 8
 local RAINBOW = 9
@@ -68,37 +68,47 @@ local function IsInFront(entPos, plyShootPos, direction)
 	return product < 0
 end
 
+-- cache colours for rainbow text
+local colours = {}
+local colourStep = 1 -- must be multiple of 360, lowering this seems to make no performance difference
+local mathFloor = math.floor -- cheaper than math.Round and close enough
+for i=0, 360-1, colourStep do -- 0 first index, 359 last index, length 360
+	colours[i] = HSVToColor(i, 1, 1)
+end
+
+local function toNearestColour(num)
+	-- num between 0 and 360
+	return colours[mathFloor(num - (num % colourStep))] or colours[0] -- fail safe
+end
 
 -- Draws the 3D2D text with the given positions, angles and data(text/font/col)
 local function Draw3D2D(ang, pos, camangle, data)
+	local multipliedCurtime = CurTime() * 60
+	local colOffset = 0
+	local speed = 5
 
-	for i = 1, data[LEN] do
-		cam.Start3D2D(pos, camangle, data[i][CAMSIZE])
+	for i, row in ipairs(data) do
+		cam.Start3D2D(pos, camangle, row[CAMSIZE])
 			render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 			-- Font
-			surface.SetFont(data[i][FONT])
+			surface.SetFont(row[FONT])
 			-- Position
-			surface.SetTextPos(data[i][POSX], data[i][POSY])
+			surface.SetTextPos(row[POSX], row[POSY])
 			-- Rainbow
-			if data[i][RAINBOW] ~= 0 then
-				local j = 0
-				for _, code in utf8.codes(data[i][TEXT]) do
-					j = j + 1
+			if row[RAINBOW] ~= 0 and rainbow_enabled and render_rainbow then
+				colOffset = 0
+				for _, code in utf8.codes(row[TEXT]) do
+					colOffset = colOffset + speed
 					--Color
-					if rainbow_enabled and render_rainbow then
-						surface.SetTextColor(HSVToColor((CurTime() * 60 + (j * 5)) % 360, 1, 1))
-					else
-						-- Render as solid white if ss_render_rainbow is disabled or server disabled via ss_enable_rainbow
-						surface.SetTextColor(255, 255, 255)
-					end
+					surface.SetTextColor(toNearestColour((multipliedCurtime - colOffset) % 360))
 					--Text
 					surface.DrawText(utf8.char(code))
 				end
 			else
 				--Color
-				surface.SetTextColor(data[i][COL])
+				surface.SetTextColor(row[COL])
 				--Text
-				surface.DrawText(data[i][TEXT])
+				surface.DrawText(row[TEXT])
 			end
 
 			render.PopFilterMin()
@@ -146,10 +156,15 @@ local function AddDrawingInfo(ent, rawData)
 	local totalHeight = 0
 	local maxWidth = 0
 	local currentHeight = 0
+	local text = ""
+
+	local function isEmptyString(str)
+		return #str == 0 or #string.Replace(str, " ", "") == 0
+	end
 
 	for i = 1, #rawData do
 		-- Setup tables
-		if not rawData[i] or #rawData[i].text == 0 then continue end
+		if not rawData[i] or isEmptyString(rawData[i].text) then continue end
 		drawData[i] = {}
 		textSize[i] = {}
 		-- Text
@@ -165,18 +180,21 @@ local function AddDrawingInfo(ent, rawData)
 		-- Position
 		totalHeight = totalHeight + textSize[i][2]
 		-- Colour
-		drawData[i][COL] = Color(rawData[i].color.r, rawData[i].color.g, rawData[i].color.b, 255)
+		if rawData[i].rainbow ~= 0 then
+			-- Render as solid white if ss_render_rainbow is disabled or server disabled via ss_enable_rainbow
+			drawData[i][COL] = surface.SetTextColor(255, 255, 255)
+		else
+			drawData[i][COL] = Color(rawData[i].color.r, rawData[i].color.g, rawData[i].color.b, 255)
+		end
 		-- Size
-		drawData[i][SIZE] = rawData[i]["size"]
-		-- Remove text if text is empty so we don't waste performance
-		if string.len(drawData[i][TEXT]) == 0 or string.len(string.Replace( drawData[i][TEXT], " ", "" )) == 0 then drawData[i][TEXT] = nil end
+		drawData[i][SIZE] = rawData[i].size
 		--Rainbow
-		drawData[i][RAINBOW] = rawData[i]["rainbow"] or 0
+		drawData[i][RAINBOW] = rawData[i].rainbow
 	end
 
 	-- Sort out heights
 	for i = 1, #rawData do
-		if not rawData[i] or #rawData[i].text == 0 then continue end
+		if not rawData[i] or isEmptyString(rawData[i].text) then continue end
 		-- The x position at which to draw the text relative to the text screen entity
 		drawData[i][POSX] = math.ceil(-textSize[i][1] / 2)
 		-- The y position at which to draw the text relative to the text screen entity
@@ -189,8 +207,6 @@ local function AddDrawingInfo(ent, rawData)
 		currentHeight = currentHeight + textSize[i][2]
 	end
 
-	-- Cache the number of lines/length
-	drawData[LEN] = #drawData
 	-- Add the new data to our text screen list
 	screenInfo[ent] = drawData
 
