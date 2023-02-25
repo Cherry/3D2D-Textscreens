@@ -24,8 +24,6 @@ if SERVER then
 	CreateConVar("sbox_maxtextscreens", "1", {FCVAR_NOTIFY, FCVAR_REPLICATED}, "Determines the maximum number of textscreens users can spawn.")
 	CreateConVar("ss_call_to_home", 0, {FCVAR_NOTIFY, FCVAR_REPLICATED}, "Determines whether anonymous usage analytics can be sent to the addon author.", 0, 1)
 
-	--local rainbow_enabled = cvars.Number('ss_enable_rainbow', 1)
-
 	local version = "1.20.0"
 
 	local function GetOS()
