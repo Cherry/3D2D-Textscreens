@@ -161,14 +161,12 @@ local function AddDrawingInfo(ent, rawData)
 		return #str == 0 or #string.Replace(str, " ", "") == 0
 	end
 
-	local function offsetAndUTF8(str)
-		local codes = {}
-		local offset = 0
+	local function toUTF8Chars(str)
+		local chars = {}
 		for _, code in utf8.codes(str) do
-			offset = offset + 1
-			codes[offset] = utf8.char(code)
+			table.insert(chars, utf8.char(code))
 		end
-		return codes
+		return chars
 	end
 
 	for i = 1, #rawData do
@@ -180,7 +178,7 @@ local function AddDrawingInfo(ent, rawData)
 		drawData[i][TEXT] = rawData[i].text
 		-- UTF8 rainbow
 		if rawData[i].rainbow ~= 0 then
-			drawData[i][UTF8CODES] = offsetAndUTF8(drawData[i][TEXT])
+			drawData[i][UTF8CODES] = toUTF8Chars(drawData[i][TEXT])
 		end
 		-- Font
 		drawData[i][FONT] = (ValidFont(rawData[i].font) or textscreenFonts[1])

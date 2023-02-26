@@ -4,6 +4,8 @@ resource.AddFile("materials/textscreens/logo.png")
 
 include("shared.lua")
 
+local max_characters = cvars.Number("ss_max_characters", 0)
+
 
 function ENT:Initialize()
 	self:SetRenderMode(RENDERMODE_TRANSALPHA)
@@ -49,12 +51,15 @@ util.AddNetworkString("textscreens_update")
 util.AddNetworkString("textscreens_download")
 
 function ENT:SetLine(line, text, color, size, font, rainbow)
-	if not text then return end
+	if #text == 0 then return end
+	text = utf8.force(text)
 	if string.sub(text, 1, 1) == "#" then
 		text = string.sub(text, 2)
 	end
-	if string.len(text) > 180 then
-		text = string.sub(text, 1, 180) .. "..."
+	if max_characters ~= 0 then
+		if string.len(text) > max_characters then
+			text = string.sub(text, 1, max_characters) .. "..."
+		end
 	end
 
 	size = math.Clamp(size, 1, 100)
@@ -64,7 +69,7 @@ function ENT:SetLine(line, text, color, size, font, rainbow)
 	rainbow = rainbow or 0
 
 	self.lines = self.lines or {}
-	self.lines[tonumber(line)] = {
+	self.lines[line] = {
 		["text"] = text,
 		["color"] = color,
 		["size"] = size,

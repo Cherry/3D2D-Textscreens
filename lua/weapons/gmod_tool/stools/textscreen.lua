@@ -353,7 +353,6 @@ function TOOL.BuildCPanel(CPanel)
 
 		for var, val in pairs(data) do
 			local name = getName(var)
-			print(var, name, getLine(var), val)
 			if fnMap[name] ~= nil then
 				fnMap[name](getLine(var), val)
 			end
