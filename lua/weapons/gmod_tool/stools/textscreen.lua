@@ -79,22 +79,19 @@ function TOOL:LeftClick(tr)
 	ply:AddCount("textscreens", textScreen)
 	ply:AddCleanup("textscreens", textScreen)
 
-	for i = 1, 5 do
-		local txt = self:GetClientInfo("text" .. i) or ""
+	for lineNum = 1, 5 do
 		textScreen:SetLine(
-			i, -- Line
-			max_characters ~= 0 and string.Left(txt, max_characters) or txt, -- text
-			Color( -- Color
-				tonumber(self:GetClientInfo("r" .. i)) or 255,
-				tonumber(self:GetClientInfo("g" .. i)) or 255,
-				tonumber(self:GetClientInfo("b" .. i)) or 255,
-				tonumber(self:GetClientInfo("a" .. i)) or 255
+			lineNum,
+			self:GetClientInfo("text" .. lineNum),
+			Color(
+				tonumber(self:GetClientInfo("r" .. lineNum)) or 255,
+				tonumber(self:GetClientInfo("g" .. lineNum)) or 255,
+				tonumber(self:GetClientInfo("b" .. lineNum)) or 255,
+				tonumber(self:GetClientInfo("a" .. lineNum)) or 255
 			),
-			tonumber(self:GetClientInfo("size" .. i)) or 20,
-			-- font
-			tonumber(self:GetClientInfo("font" .. i)) or 1,
-
-			rainbow_enabled == 1 and tonumber(self:GetClientInfo("rainbow" .. i)) or 0
+			tonumber(self:GetClientInfo("size" .. lineNum)),
+			tonumber(self:GetClientInfo("font" .. lineNum)),
+			tonumber(self:GetClientInfo("rainbow" .. lineNum))
 		)
 	end
 
@@ -107,22 +104,19 @@ function TOOL:RightClick(tr)
 	local traceEnt = tr.Entity
 
 	if (IsValid(TraceEnt) and traceEnt:GetClass() == "sammyservers_textscreen") then
-		for i = 1, 5 do
-			local txt = tostring(self:GetClientInfo("text" .. i))
+		for lineNum = 1, 5 do
 			traceEnt:SetLine(
-				i, -- Line
-				max_characters ~= 0 and string.Left(txt, max_characters) or txt, -- text
-				Color( -- Color
-					tonumber(self:GetClientInfo("r" .. i)) or 255,
-					tonumber(self:GetClientInfo("g" .. i)) or 255,
-					tonumber(self:GetClientInfo("b" .. i)) or 255,
-					tonumber(self:GetClientInfo("a" .. i)) or 255
+				lineNum,
+				self:GetClientInfo("text" .. lineNum),
+				Color(
+					tonumber(self:GetClientInfo("r" .. lineNum)) or 255,
+					tonumber(self:GetClientInfo("g" .. lineNum)) or 255,
+					tonumber(self:GetClientInfo("b" .. lineNum)) or 255,
+					tonumber(self:GetClientInfo("a" .. lineNum)) or 255
 				),
-				tonumber(self:GetClientInfo("size" .. i)) or 20,
-				-- font
-				tonumber(self:GetClientInfo("font" .. i)) or 1,
-
-				rainbow_enabled and tonumber(self:GetClientInfo("rainbow" .. i)) or 0
+				tonumber(self:GetClientInfo("size" .. lineNum)),
+				tonumber(self:GetClientInfo("font" .. lineNum)),
+				tonumber(self:GetClientInfo("rainbow" .. lineNum))
 			)
 		end
 
@@ -137,16 +131,16 @@ function TOOL:Reload(tr)
 	local traceEnt = tr.Entity
 	if (not isentity(traceEnt) or traceEnt:GetClass() ~= "sammyservers_textscreen") then return false end
 
-	for i = 1, 5 do
-		local linedata = traceEnt.lines[i]
-		RunConsoleCommand("textscreen_r" .. i, linedata.color.r)
-		RunConsoleCommand("textscreen_g" .. i, linedata.color.g)
-		RunConsoleCommand("textscreen_b" .. i, linedata.color.b)
-		RunConsoleCommand("textscreen_a" .. i, linedata.color.a)
-		RunConsoleCommand("textscreen_size" .. i, linedata.size)
-		RunConsoleCommand("textscreen_text" .. i, linedata.text)
-		RunConsoleCommand("textscreen_font" .. i, linedata.font)
-		RunConsoleCommand("textscreen_rainbow" .. i, linedata.rainbow)
+	for lineNum = 1, 5 do
+		local linedata = traceEnt.lines[lineNum]
+		RunConsoleCommand("textscreen_r" .. lineNum, linedata.color.r)
+		RunConsoleCommand("textscreen_g" .. lineNum, linedata.color.g)
+		RunConsoleCommand("textscreen_b" .. lineNum, linedata.color.b)
+		RunConsoleCommand("textscreen_a" .. lineNum, linedata.color.a)
+		RunConsoleCommand("textscreen_size" .. lineNum, linedata.size)
+		RunConsoleCommand("textscreen_text" .. lineNum, linedata.text)
+		RunConsoleCommand("textscreen_font" .. lineNum, linedata.font)
+		RunConsoleCommand("textscreen_rainbow" .. lineNum, linedata.rainbow)
 	end
 
 	return true
@@ -185,20 +179,85 @@ function TOOL.BuildCPanel(CPanel)
 		changefont:SetText("Change font (" .. font .. ")")
 	end)
 
-	local function ResetFont(lines, text)
-		if #lines >= 5 then
-			fontnum = 1
-			for i = 1, 5 do
-				RunConsoleCommand("textscreen_font" .. i, 1)
+	local function SetColor(lineNum, col)
+		RunConsoleCommand("textscreen_r" .. lineNum, col.r)
+		RunConsoleCommand("textscreen_g" .. lineNum, col.g)
+		RunConsoleCommand("textscreen_b" .. lineNum, col.b)
+		RunConsoleCommand("textscreen_a" .. lineNum, col.a)
+	end
+
+	local function ResetColor(lineNum)
+		SetColor(lineNum, Color(255,255,255,255))
+	end
+
+	local function SetSize(lineNum, size)
+		size = tonumber(size) or 20
+		RunConsoleCommand("textscreen_size" .. lineNum, size)
+		sliders[lineNum]:SetValue(size)
+		labels[lineNum]:SetFont(textscreenFonts[fontnum] .. "_MENU")
+	end
+
+	local function ResetSize(lineNum)
+		SetSize(lineNum, 20)
+	end
+
+	local function SetText(lineNum, text)
+		RunConsoleCommand("textscreen_text" .. lineNum, text)
+		textBox[lineNum]:SetValue(text)
+		labels[lineNum]:SetText(text)
+	end
+
+	local function ResetText(lineNum)
+		SetText(lineNum, "")
+	end
+
+	local function SetFont(lineNum, fontNum)
+		fontnum = tonumber(fontNum) or 1
+		RunConsoleCommand("textscreen_font" .. lineNum, fontnum)
+		labels[lineNum]:SetFont(textscreenFonts[fontnum] .. "_MENU")
+	end
+
+	local function ResetFont(lineNum)
+		fontnum = 1
+		SetFont(lineNum, fontnum)
+	end
+
+	local function SetRainbow(lineNum, enabled)
+		enabled = tonumber(tobool(enabled))
+		RunConsoleCommand("textscreen_rainbow" .. lineNum, enabled)
+		rainbowCheckboxes[lineNum]:SetValue(enabled)
+	end
+
+	local function ResetRainbow(lineNum)
+		SetRainbow(lineNum, 0)
+	end
+
+	local function fnResetLine(lineNum, fns)
+		return function()
+			for _, fn in pairs(fns) do
+				fn(lineNum)
 			end
 		end
-		for k, i in pairs(lines) do
-			if text then
-				RunConsoleCommand("textscreen_text" .. i, "")
-				labels[i]:SetText("")
+	end
+
+	local function fnResetAllLines(fns)
+		return function()
+			for lineNum = 1, 5 do
+				fnResetLine(lineNum, fns)()
 			end
-			labels[i]:SetFont(textscreenFonts[fontnum] .. "_MENU")
 		end
+	end
+
+	local allResets = {
+		ResetColor,
+		ResetSize,
+		ResetText,
+		ResetFont,
+		ResetRainbow
+	}
+
+	local function fnResetEverything()
+		fnResetAllLines(allResets)()
 	end
 
 	resetall = vgui.Create("DButton", resetbuttons)
@@ -208,59 +267,16 @@ function TOOL.BuildCPanel(CPanel)
 	resetall.DoClick = function()
 		local menu = DermaMenu()
 
-		menu:AddOption("Reset colors", function()
-			for i = 1, 5 do
-				RunConsoleCommand("textscreen_r" .. i, 255)
-				RunConsoleCommand("textscreen_g" .. i, 255)
-				RunConsoleCommand("textscreen_b" .. i, 255)
-				RunConsoleCommand("textscreen_a" .. i, 255)
-			end
-		end)
-
-		menu:AddOption("Reset sizes", function()
-			for i = 1, 5 do
-				RunConsoleCommand("textscreen_size" .. i, 20)
-				sliders[i]:SetValue(20)
-				labels[i]:SetFont(textscreenFonts[fontnum] .. "_MENU")
-			end
-		end)
-
-		menu:AddOption("Reset textboxes", function()
-			for i = 1, 5 do
-				RunConsoleCommand("textscreen_text" .. i, "")
-				textBox[i]:SetValue("")
-			end
-		end)
-
-		menu:AddOption("Reset fonts", function()
-			ResetFont({1, 2, 3, 4, 5}, false)
-		end)
+		menu:AddOption("Reset colors", fnResetAllLines({ResetColor}))
+		menu:AddOption("Reset sizes", fnResetAllLines({ResetSize}))
+		menu:AddOption("Reset textboxes", fnResetAllLines({ResetText}))
+		menu:AddOption("Reset fonts", fnResetAllLines({ResetFont}))
 
 		if rainbow_enabled == 1 then
-			menu:AddOption("Reset rainbow", function()
-				for i = 1, 5 do
-					rainbowCheckboxes[i]:SetValue(0)
-				end
-			end)
+			menu:AddOption("Reset rainbow", fnResetAllLines({ResetRainbow}))
 		end
 
-		menu:AddOption("Reset everything", function()
-			for i = 1, 5 do
-				RunConsoleCommand("textscreen_r" .. i, 255)
-				RunConsoleCommand("textscreen_g" .. i, 255)
-				RunConsoleCommand("textscreen_b" .. i, 255)
-				RunConsoleCommand("textscreen_a" .. i, 255)
-				RunConsoleCommand("textscreen_size" .. i, 20)
-				sliders[i]:SetValue(20)
-				RunConsoleCommand("textscreen_text" .. i, "")
-				RunConsoleCommand("textscreen_font" .. i, 1)
-				textBox[i]:SetValue("")
-				if rainbow_enabled == 1 then
-					rainbowCheckboxes[i]:SetValue(0)
-				end
-			end
-			ResetFont({1, 2, 3, 4, 5}, true)
-		end)
+		menu:AddOption("Reset everything", fnResetEverything)
 
 		menu:Open()
 	end
@@ -274,33 +290,8 @@ function TOOL.BuildCPanel(CPanel)
 		local menu = DermaMenu()
 
 		for i = 1, 5 do
-			menu:AddOption("Reset line " .. i, function()
-				RunConsoleCommand("textscreen_r" .. i, 255)
-				RunConsoleCommand("textscreen_g" .. i, 255)
-				RunConsoleCommand("textscreen_b" .. i, 255)
-				RunConsoleCommand("textscreen_a" .. i, 255)
-				RunConsoleCommand("textscreen_size" .. i, 20)
-				sliders[i]:SetValue(20)
-				RunConsoleCommand("textscreen_text" .. i, "")
-				textBox[i]:SetValue("")
-				ResetFont({i}, true)
-			end)
+			menu:AddOption("Reset line " .. i, fnResetLine(i, allResets))
 		end
-
-		menu:AddOption("Reset all lines", function()
-			for i = 1, 5 do
-				RunConsoleCommand("textscreen_r" .. i, 255)
-				RunConsoleCommand("textscreen_g" .. i, 255)
-				RunConsoleCommand("textscreen_b" .. i, 255)
-				RunConsoleCommand("textscreen_a" .. i, 255)
-				RunConsoleCommand("textscreen_size" .. i, 20)
-				sliders[i]:SetValue(20)
-				RunConsoleCommand("textscreen_text" .. i, "")
-				RunConsoleCommand("textscreen_font" .. i, 1)
-				textBox[i]:SetValue("")
-			end
-			ResetFont({1, 2, 3, 4, 5}, true)
-		end)
 
 		menu:Open()
 	end
@@ -332,7 +323,7 @@ function TOOL.BuildCPanel(CPanel)
 
 	CPanel:AddItem(changefont)
 
-	CPanel:AddControl("ComboBox", {
+	local controlPresets = CPanel:AddControl("ComboBox", {
 		MenuButton = 1,
 		Folder = "textscreen",
 		Options = {
@@ -340,6 +331,36 @@ function TOOL.BuildCPanel(CPanel)
 		},
 		CVars = table.GetKeys(conVarsDefault)
 	})
+	local originalOnSelect = controlPresets.DropDown.OnSelect
+	controlPresets.DropDown.OnSelect = function(self, index, value, data, ...)
+		local ret = originalOnSelect(self, index, value, data, ...)
+
+		local prefix = "textscreen"
+		local getName = function(var) 
+			return string.match(var, prefix .. "_(%a+)") 
+		end
+		local getLine = function(var) 
+			return tonumber(string.match(var, prefix .. "_%a+(%d)")) 
+		end
+
+		-- Go over all those that directly set UI elements
+		local fnMap = {
+			size = SetSize,
+			text = SetText,
+			font = SetFont,
+			rainbow = SetRainbow
+		}
+
+		for var, val in pairs(data) do
+			local name = getName(var)
+			print(var, name, getLine(var), val)
+			if fnMap[name] ~= nil then
+				fnMap[name](getLine(var), val)
+			end
+		end
+
+		return ret
+	end
 
 	for i = 1, 5 do
 		lineLabels[i] = CPanel:AddControl("Label", {
