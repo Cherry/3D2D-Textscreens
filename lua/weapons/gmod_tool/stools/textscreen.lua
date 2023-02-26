@@ -179,71 +179,83 @@ function TOOL.BuildCPanel(CPanel)
 		changefont:SetText("Change font (" .. font .. ")")
 	end)
 
-	local function SetColor(lineNum, col)
-		RunConsoleCommand("textscreen_r" .. lineNum, col.r)
-		RunConsoleCommand("textscreen_g" .. lineNum, col.g)
-		RunConsoleCommand("textscreen_b" .. lineNum, col.b)
-		RunConsoleCommand("textscreen_a" .. lineNum, col.a)
+	local function SetColor(lineNum, col, uiOnly)
+		if not uiOnly then
+			RunConsoleCommand("textscreen_r" .. lineNum, col.r)
+			RunConsoleCommand("textscreen_g" .. lineNum, col.g)
+			RunConsoleCommand("textscreen_b" .. lineNum, col.b)
+			RunConsoleCommand("textscreen_a" .. lineNum, col.a)
+		end
 	end
 
-	local function ResetColor(lineNum)
-		SetColor(lineNum, Color(255,255,255,255))
+	local function ResetColor(lineNum, uiOnly)
+		SetColor(lineNum, Color(255,255,255,255), uiOnly)
 	end
 
-	local function SetSize(lineNum, size)
+	local function SetSize(lineNum, size, uiOnly)
 		size = tonumber(size) or 20
-		RunConsoleCommand("textscreen_size" .. lineNum, size)
+		if not uiOnly then
+			RunConsoleCommand("textscreen_size" .. lineNum, size)
+		end
 		sliders[lineNum]:SetValue(size)
 		labels[lineNum]:SetFont(textscreenFonts[fontnum] .. "_MENU")
 	end
 
-	local function ResetSize(lineNum)
-		SetSize(lineNum, 20)
+	local function ResetSize(lineNum, uiOnly)
+		SetSize(lineNum, 20, uiOnly)
 	end
 
-	local function SetText(lineNum, text)
-		RunConsoleCommand("textscreen_text" .. lineNum, text)
+	local function SetText(lineNum, text, uiOnly)
+		if not uiOnly then
+			RunConsoleCommand("textscreen_text" .. lineNum, text)
+		end
 		textBox[lineNum]:SetValue(text)
 		labels[lineNum]:SetText(text)
 	end
 
-	local function ResetText(lineNum)
+	local function ResetText(lineNum, uiOnly)
 		SetText(lineNum, "")
 	end
 
-	local function SetFont(lineNum, fontNum)
+	local function SetFont(lineNum, fontNum, uiOnly)
 		fontnum = tonumber(fontNum) or 1
-		RunConsoleCommand("textscreen_font" .. lineNum, fontnum)
+		if not uiOnly then
+			RunConsoleCommand("textscreen_font" .. lineNum, fontnum)
+		end
 		labels[lineNum]:SetFont(textscreenFonts[fontnum] .. "_MENU")
 	end
 
-	local function ResetFont(lineNum)
+	local function ResetFont(lineNum, uiOnly)
 		fontnum = 1
-		SetFont(lineNum, fontnum)
+		SetFont(lineNum, fontnum, uiOnly)
 	end
 
-	local function SetRainbow(lineNum, enabled)
+	local function SetRainbow(lineNum, enabled, uiOnly)
 		enabled = tonumber(tobool(enabled))
-		RunConsoleCommand("textscreen_rainbow" .. lineNum, enabled)
+		if not uiOnly then
+			RunConsoleCommand("textscreen_rainbow" .. lineNum, enabled)
+		end
 		rainbowCheckboxes[lineNum]:SetValue(enabled)
 	end
 
-	local function ResetRainbow(lineNum)
-		SetRainbow(lineNum, 0)
+	local function ResetRainbow(lineNum, uiOnly)
+		SetRainbow(lineNum, 0, uiOnly)
 	end
 
-	local function fnResetLine(lineNum, fns)
+	local function fnResetLine(lineNum, fns, uiOnly)
+		uiOnly = isbool(uiOnly) and uiOnly or false
 		return function()
 			for _, fn in pairs(fns) do
-				fn(lineNum)
+				fn(lineNum, uiOnly)
 			end
 		end
 	end
 
-	local function fnResetAllLines(fns)
+	local function fnResetAllLines(fns, uiOnly)
+		uiOnly = isbool(uiOnly) and uiOnly or false
 		return function()
 			for lineNum = 1, 5 do
-				fnResetLine(lineNum, fns)()
+				fnResetLine(lineNum, fns, uiOnly)()
 			end
 		end
 	end
@@ -256,8 +268,9 @@ function TOOL.BuildCPanel(CPanel)
 		ResetRainbow
 	}
 
-	local function fnResetEverything()
-		fnResetAllLines(allResets)()
+	local function fnResetEverything(uiOnly)
+		uiOnly = isbool(uiOnly) and uiOnly or false
+		fnResetAllLines(allResets, uiOnly)()
 	end
 
 	resetall = vgui.Create("DButton", resetbuttons)
@@ -351,6 +364,7 @@ function TOOL.BuildCPanel(CPanel)
 			rainbow = SetRainbow
 		}
 
+		fnResetEverything(true) -- reset ui
 		for var, val in pairs(data) do
 			local name = getName(var)
 			if fnMap[name] ~= nil then
