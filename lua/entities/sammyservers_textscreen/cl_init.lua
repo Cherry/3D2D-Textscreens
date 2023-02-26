@@ -157,10 +157,6 @@ local function AddDrawingInfo(ent, rawData)
 	local maxWidth = 0
 	local currentHeight = 0
 
-	local function isEmptyString(str)
-		return #str == 0 or #string.Replace(str, " ", "") == 0
-	end
-
 	local function toUTF8Chars(str)
 		local chars = {}
 		for _, code in utf8.codes(str) do
