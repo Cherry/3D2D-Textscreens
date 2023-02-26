@@ -191,9 +191,9 @@ local function AddDrawingInfo(ent, rawData)
 			drawData[lineNum][COL] = Color(255, 255, 255)
 		else
 			drawData[lineNum][COL] = Color(
-				line.color.r, 
-				line.color.g, 
-				line.color.b, 
+				line.color.r,
+				line.color.g,
+				line.color.b,
 				255
 			)
 		end

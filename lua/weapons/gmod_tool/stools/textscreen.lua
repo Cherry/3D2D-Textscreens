@@ -144,7 +144,7 @@ function TOOL:Reload(tr)
 			RunConsoleCommand("textscreen_rainbow" .. lineNum, 0)
 		end
 	end
-	
+
 	for lineNum, linedata in pairs(traceEnt.lines) do
 		RunConsoleCommand("textscreen_r" .. lineNum, linedata.color.r)
 		RunConsoleCommand("textscreen_g" .. lineNum, linedata.color.g)
@@ -289,7 +289,7 @@ function TOOL.BuildCPanel(CPanel)
 	-- Update ui when copying screens
 	local function addConVarListener(var, setter)
 		for i = 1, 5 do
-			cvars.AddChangeCallback(var..i, function(convar_name, value_old, value_new)
+			cvars.AddChangeCallback(var .. i, function(convar_name, value_old, value_new)
 				setter(i, value_new, true)
 			end)
 		end
@@ -301,7 +301,7 @@ function TOOL.BuildCPanel(CPanel)
 		rainbow = SetRainbow
 	}
 	for name, fn in pairs(fnMap) do
-		addConVarListener(prefix.."_"..name, fn)
+		addConVarListener(prefix .. "_" .. name, fn)
 	end
 
 	resetall = vgui.Create("DButton", resetbuttons)

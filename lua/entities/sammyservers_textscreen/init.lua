@@ -60,10 +60,8 @@ function ENT:SetLine(line, text, color, size, font, rainbow)
 	if string.sub(text, 1, 1) == "#" then
 		text = string.sub(text, 2)
 	end
-	if max_characters ~= 0 then
-		if string.len(text) > max_characters then
-			text = string.sub(text, 1, max_characters) .. "..."
-		end
+	if max_characters ~= 0 and string.len(text) > max_characters then
+		text = string.sub(text, 1, max_characters) .. "..."
 	end
 
 	size = math.Clamp(size, 1, 100)
