@@ -50,8 +50,12 @@ hook.Add("PhysgunDrop", "3D2DTextScreensPreventTravelDrop", textScreenDrop)
 util.AddNetworkString("textscreens_update")
 util.AddNetworkString("textscreens_download")
 
+local function isEmptyString(str)
+	return #str == 0 or #string.Replace(str, " ", "") == 0
+end
+
 function ENT:SetLine(line, text, color, size, font, rainbow)
-	if #text == 0 then return end
+	if isEmptyString(text) then return end
 	text = utf8.force(text)
 	if string.sub(text, 1, 1) == "#" then
 		text = string.sub(text, 2)

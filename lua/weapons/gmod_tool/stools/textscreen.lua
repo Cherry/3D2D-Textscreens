@@ -103,7 +103,7 @@ function TOOL:RightClick(tr)
 	if (CLIENT) then return true end
 	local traceEnt = tr.Entity
 
-	if (IsValid(TraceEnt) and traceEnt:GetClass() == "sammyservers_textscreen") then
+	if (IsValid(traceEnt) and traceEnt:GetClass() == "sammyservers_textscreen") then
 		for lineNum = 1, 5 do
 			traceEnt:SetLine(
 				lineNum,
@@ -131,8 +131,21 @@ function TOOL:Reload(tr)
 	local traceEnt = tr.Entity
 	if (not isentity(traceEnt) or traceEnt:GetClass() ~= "sammyservers_textscreen") then return false end
 
+	-- reset
 	for lineNum = 1, 5 do
-		local linedata = traceEnt.lines[lineNum]
+		if traceEnt.lines[lineNum] == nil then
+			RunConsoleCommand("textscreen_r" .. lineNum, 255)
+			RunConsoleCommand("textscreen_g" .. lineNum, 255)
+			RunConsoleCommand("textscreen_b" .. lineNum, 255)
+			RunConsoleCommand("textscreen_a" .. lineNum, 255)
+			RunConsoleCommand("textscreen_size" .. lineNum, 20)
+			RunConsoleCommand("textscreen_text" .. lineNum, "")
+			RunConsoleCommand("textscreen_font" .. lineNum, 1)
+			RunConsoleCommand("textscreen_rainbow" .. lineNum, 0)
+		end
+	end
+	
+	for lineNum, linedata in pairs(traceEnt.lines) do
 		RunConsoleCommand("textscreen_r" .. lineNum, linedata.color.r)
 		RunConsoleCommand("textscreen_g" .. lineNum, linedata.color.g)
 		RunConsoleCommand("textscreen_b" .. lineNum, linedata.color.b)
@@ -196,8 +209,8 @@ function TOOL.BuildCPanel(CPanel)
 		size = tonumber(size) or 20
 		if not uiOnly then
 			RunConsoleCommand("textscreen_size" .. lineNum, size)
+			sliders[lineNum]:SetValue(size)
 		end
-		sliders[lineNum]:SetValue(size)
 		labels[lineNum]:SetFont(textscreenFonts[fontnum] .. "_MENU")
 	end
 
@@ -208,8 +221,8 @@ function TOOL.BuildCPanel(CPanel)
 	local function SetText(lineNum, text, uiOnly)
 		if not uiOnly then
 			RunConsoleCommand("textscreen_text" .. lineNum, text)
+			textBox[lineNum]:SetValue(text)
 		end
-		textBox[lineNum]:SetValue(text)
 		labels[lineNum]:SetText(text)
 	end
 
@@ -234,8 +247,8 @@ function TOOL.BuildCPanel(CPanel)
 		enabled = tonumber(tobool(enabled))
 		if not uiOnly then
 			RunConsoleCommand("textscreen_rainbow" .. lineNum, enabled)
+			rainbowCheckboxes[lineNum]:SetValue(enabled)
 		end
-		rainbowCheckboxes[lineNum]:SetValue(enabled)
 	end
 
 	local function ResetRainbow(lineNum, uiOnly)
@@ -268,9 +281,27 @@ function TOOL.BuildCPanel(CPanel)
 		ResetRainbow
 	}
 
-	local function fnResetEverything(uiOnly)
+	local function ResetEverything(uiOnly)
 		uiOnly = isbool(uiOnly) and uiOnly or false
 		fnResetAllLines(allResets, uiOnly)()
+	end
+
+	-- Update ui when copying screens
+	local function addConVarListener(var, setter)
+		for i = 1, 5 do
+			cvars.AddChangeCallback(var..i, function(convar_name, value_old, value_new)
+				setter(i, value_new, true)
+			end)
+		end
+	end
+	local prefix = "textscreen"
+	local fnMap = {
+		text = SetText,
+		font = SetFont,
+		rainbow = SetRainbow
+	}
+	for name, fn in pairs(fnMap) do
+		addConVarListener(prefix.."_"..name, fn)
 	end
 
 	resetall = vgui.Create("DButton", resetbuttons)
@@ -289,7 +320,7 @@ function TOOL.BuildCPanel(CPanel)
 			menu:AddOption("Reset rainbow", fnResetAllLines({ResetRainbow}))
 		end
 
-		menu:AddOption("Reset everything", fnResetEverything)
+		menu:AddOption("Reset everything", ResetEverything)
 
 		menu:Open()
 	end
@@ -346,33 +377,8 @@ function TOOL.BuildCPanel(CPanel)
 	})
 	local originalOnSelect = controlPresets.DropDown.OnSelect
 	controlPresets.DropDown.OnSelect = function(self, index, value, data, ...)
-		local ret = originalOnSelect(self, index, value, data, ...)
-
-		local prefix = "textscreen"
-		local getName = function(var) 
-			return string.match(var, prefix .. "_(%a+)") 
-		end
-		local getLine = function(var) 
-			return tonumber(string.match(var, prefix .. "_%a+(%d)")) 
-		end
-
-		-- Go over all those that directly set UI elements
-		local fnMap = {
-			size = SetSize,
-			text = SetText,
-			font = SetFont,
-			rainbow = SetRainbow
-		}
-
-		fnResetEverything(true) -- reset ui
-		for var, val in pairs(data) do
-			local name = getName(var)
-			if fnMap[name] ~= nil then
-				fnMap[name](getLine(var), val)
-			end
-		end
-
-		return ret
+		ResetEverything()
+		return originalOnSelect(self, index, value, data, ...)
 	end
 
 	for i = 1, 5 do

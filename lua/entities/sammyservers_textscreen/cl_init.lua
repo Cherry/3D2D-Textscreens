@@ -169,53 +169,56 @@ local function AddDrawingInfo(ent, rawData)
 		return chars
 	end
 
-	for i = 1, #rawData do
+	for lineNum, line in pairs(rawData) do
 		-- Setup tables
-		if not rawData[i] or isEmptyString(rawData[i].text) then continue end
-		drawData[i] = {}
-		textSize[i] = {}
+		drawData[lineNum] = {}
+		textSize[lineNum] = {}
 		-- Text
-		drawData[i][TEXT] = rawData[i].text
+		drawData[lineNum][TEXT] = line.text
 		-- UTF8 rainbow
-		if rawData[i].rainbow ~= 0 then
-			drawData[i][UTF8CODES] = toUTF8Chars(drawData[i][TEXT])
+		if line.rainbow ~= 0 then
+			drawData[lineNum][UTF8CODES] = toUTF8Chars(line.text)
 		end
 		-- Font
-		drawData[i][FONT] = (ValidFont(rawData[i].font) or textscreenFonts[1])
+		drawData[lineNum][FONT] = (ValidFont(line.font) or textscreenFonts[1])
 		-- Text size
-		surface.SetFont(drawData[i][FONT])
-		textSize[i][1], textSize[i][2] = surface.GetTextSize(drawData[i][TEXT])
-		textSize[i][2] = rawData[i].size
+		surface.SetFont(drawData[lineNum][FONT])
+		textSize[lineNum][1], textSize[lineNum][2] = surface.GetTextSize(drawData[lineNum][TEXT])
+		textSize[lineNum][2] = line.size
 		-- Workout max width for render bounds
-		maxWidth = maxWidth > textSize[i][1] and maxWidth or textSize[i][1]
+		maxWidth = maxWidth > textSize[lineNum][1] and maxWidth or textSize[lineNum][1]
 		-- Position
-		totalHeight = totalHeight + textSize[i][2]
+		totalHeight = totalHeight + textSize[lineNum][2]
 		-- Colour
-		if rawData[i].rainbow ~= 0 then
+		if line.rainbow ~= 0 then
 			-- Render as solid white if ss_render_rainbow is disabled or server disabled via ss_enable_rainbow
-			drawData[i][COL] = Color(255, 255, 255)
+			drawData[lineNum][COL] = Color(255, 255, 255)
 		else
-			drawData[i][COL] = Color(rawData[i].color.r, rawData[i].color.g, rawData[i].color.b, 255)
+			drawData[lineNum][COL] = Color(
+				line.color.r, 
+				line.color.g, 
+				line.color.b, 
+				255
+			)
 		end
 		-- Size
-		drawData[i][SIZE] = rawData[i].size
+		drawData[lineNum][SIZE] = rawData[lineNum].size
 		--Rainbow
-		drawData[i][RAINBOW] = rawData[i].rainbow
+		drawData[lineNum][RAINBOW] = rawData[lineNum].rainbow
 	end
 
 	-- Sort out heights
-	for i = 1, #rawData do
-		if not rawData[i] or isEmptyString(rawData[i].text) then continue end
+	for lineNum, line in pairs(drawData) do
 		-- The x position at which to draw the text relative to the text screen entity
-		drawData[i][POSX] = math.ceil(-textSize[i][1] / 2)
+		drawData[lineNum][POSX] = math.ceil(-textSize[lineNum][1] / 2)
 		-- The y position at which to draw the text relative to the text screen entity
-		drawData[i][POSY] = math.ceil(-(totalHeight / 2) + currentHeight)
+		drawData[lineNum][POSY] = math.ceil(-(totalHeight / 2) + currentHeight)
 		-- Calculate the cam.Start3D2D size based on the size of the font
-		drawData[i][CAMSIZE] = (0.25 * drawData[i][SIZE]) / 100
+		drawData[lineNum][CAMSIZE] = (0.25 * drawData[lineNum][SIZE]) / 100
 		-- Use the CAMSIZE to "scale" the POSY
-		drawData[i][POSY] = (0.25 / drawData[i][CAMSIZE] * drawData[i][POSY])
+		drawData[lineNum][POSY] = (0.25 / drawData[lineNum][CAMSIZE] * drawData[lineNum][POSY])
 		-- Highest line to lowest, so that everything is central
-		currentHeight = currentHeight + textSize[i][2]
+		currentHeight = currentHeight + textSize[lineNum][2]
 	end
 
 	-- Add the new data to our text screen list
