@@ -106,7 +106,7 @@ function TOOL:RightClick(tr)
 	if (CLIENT) then return true end
 	local traceEnt = tr.Entity
 
-	if (IsValid(TraceEnt) and traceEnt:GetClass() == "sammyservers_textscreen") then
+	if (IsValid(traceEnt) and traceEnt:GetClass() == "sammyservers_textscreen") then
 		for i = 1, 5 do
 			local txt = tostring(self:GetClientInfo("text" .. i))
 			traceEnt:SetLine(
