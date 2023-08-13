@@ -76,25 +76,30 @@ function ENT:SetLine(line, text, color, size, font, rainbow)
 	}
 end
 
-local canSendUpdate
+local function canSendUpdate(ply, ent)
+	local updates = ply.TextScreenUpdates
+	if not updates then
+		updates = {}
+		ply.TextScreenUpdates = updates
+	end
 
-do
-	local updates, now, lastSent
-	canSendUpdate = function(ply, ent)
-		updates = ply.TextScreenUpdates
-		if not updates then
-			updates = {}
-			ply.TextScreenUpdates = updates
-		end
+	local now = CurTime()
+	local lastSent = updates[ent] or 0
+	if lastSent > (now - 1) then
+		return false
+	end
 
-		now = CurTime()
-		lastSent = updates[ent] or 0
-		if lastSent > ( now - 1 ) then
-			return false
-		end
+	updates[ent] = now
+	return true
+end
 
-		updates[ent] = now
-		return true
+function ENT:OnRemove()
+	local plys = player.GetAll()
+	local plyCount = #plys
+
+	for i = 1, plyCount do
+		local updates = plys[i].TextScreenUpdates
+		if updates then updates[self] = nil end
 	end
 end
 
