@@ -30,7 +30,6 @@
 * `sbox_maxtextscreens` controls the maximum amount of text screens that each player can spawn. This defaults to 1. This cvar only exists on the server, so make sure it's set via RCON, or in something like server.cfg.
 * `ss_enable_rainbow` controls whether players on your server can use the rainbow effect. Set this to `0` in your `server.cfg` to prevent anyone from using rainbow effects.
 * `ss_max_characters` controls whether players on your server can use a lot of characters per lines. Set this to `any number` in your `server.cfg` to prevent anyone from using more characters.
-* Set `ss_call_to_home 1` on your server to provide anonymous analytics including your operating system, version of the addon, and rough, anonymised geo-location. This is entirely optional and used solely to put a smile on my face.
 * To install this onto your server, follow the instructions [listed here](https://wiki.garrysmod.com/page/Workshop_for_Dedicated_Servers).
 
 ### Prevent specific users/groups from using textscreens
