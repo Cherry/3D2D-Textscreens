@@ -141,3 +141,5 @@ function ENT:Think()
 	self:NextThink(CurTime() + 5)
 	return true
 end
+
+duplicator.RegisterEntityClass("sammyservers_textscreen", duplicator.GenericDuplicatorFunction, "Data")
