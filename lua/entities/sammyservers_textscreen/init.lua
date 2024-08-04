@@ -132,3 +132,14 @@ end
 function ENT:Broadcast()
 	self:SendLines(nil)
 end
+
+function ENT:Think()
+	if not self:IsSolid() then -- Removes textscreen if it can not be picked by toolgun (and removed by admins)
+		self:Remove()
+	end
+
+	self:NextThink(CurTime() + 5)
+	return true
+end
+
+duplicator.RegisterEntityClass("sammyservers_textscreen", duplicator.GenericDuplicatorFunction, "Data")
