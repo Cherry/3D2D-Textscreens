@@ -174,6 +174,12 @@ local function AddDrawingInfo(ent, rawData)
 		if string.len(drawData[i][TEXT]) == 0 or string.len(string.Replace( drawData[i][TEXT], " ", "" )) == 0 then drawData[i][TEXT] = nil end
 		--Rainbow
 		drawData[i][RAINBOW] = rawData[i]["rainbow"] or 0
+		-- Rainbow mode iterates with utf8.codes which errors on invalid UTF-8 and
+		-- leaves render.PushFilterMin / cam.Start3D2D unbalanced. Fall back to plain
+		-- rendering for lines that are not valid UTF-8.
+		if drawData[i][RAINBOW] ~= 0 and drawData[i][TEXT] ~= nil and not utf8.len(drawData[i][TEXT]) then
+			drawData[i][RAINBOW] = 0
+		end
 	end
 
 	-- Sort out heights
